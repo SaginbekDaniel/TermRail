@@ -157,6 +157,7 @@ async def inbox(workspace_id: uuid.UUID, user: CurrentUser, db: DB) -> list[S.In
     return [
         S.InboxItemOut(
             finding_id=f.id,
+            request_item_id=i.id,
             request_id=r.id,
             project_id=p.id,
             project_title=p.title,

@@ -570,6 +570,7 @@ class OverviewOut(BaseModel):
 
 class InboxItemOut(BaseModel):
     finding_id: uuid.UUID
+    request_item_id: uuid.UUID
     request_id: uuid.UUID
     project_id: uuid.UUID
     project_title: str

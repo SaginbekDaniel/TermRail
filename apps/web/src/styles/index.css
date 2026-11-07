@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/*
+ * ScopeLock design tokens. The theme (light/dark) is resolved before first paint by the boot
+ * script in index.html, which always sets data-theme on <html>.
+ * Components use ONLY these semantic tokens (via the Tailwind theme
+ * below), never raw palette values, so light/dark and future re-theming stay a one-file change.
+ */
+:root {
+  color-scheme: light;
+  --sl-canvas: #f6f7f9;
+  --sl-surface: #ffffff;
+  --sl-surface-muted: #f1f3f6;
+  --sl-surface-sunken: #eceff3;
+  --sl-border: #dfe3e9;
+  --sl-border-strong: #c5ccd6;
+  --sl-text: #161b22;
+  --sl-text-muted: #525c69;
+  --sl-text-subtle: #737d8a;
+  --sl-text-inverse: #ffffff;
+
+  --sl-accent: #2f4ad0;
+  --sl-accent-hover: #2639ab;
+  --sl-accent-soft: #eaeefd;
+  --sl-accent-text: #2639ab;
+  --sl-focus: #2f4ad0;
+
+  --sl-success: #1a7f4b;
+  --sl-success-soft: #e6f4ec;
+  --sl-warning: #9a5b00;
+  --sl-warning-soft: #fdf1dc;
+  --sl-danger: #b42318;
+  --sl-danger-soft: #fdecea;
+  --sl-info: #1f63b5;
+  --sl-info-soft: #e7f0fb;
+  --sl-violet: #6b3fb8;
+  --sl-violet-soft: #f1ebfb;
+
+  --sl-highlight: #fff1b8;
+  --sl-shadow-overlay: 0 12px 32px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --sl-canvas: #0f1216;
+  --sl-surface: #161a20;
+  --sl-surface-muted: #1c2128;
+  --sl-surface-sunken: #12161b;
+  --sl-border: #2a313b;
+  --sl-border-strong: #3a434f;
+  --sl-text: #e7eaee;
+  --sl-text-muted: #a3acb8;
+  --sl-text-subtle: #828c99;
+  --sl-text-inverse: #0f1216;
+  --sl-accent: #7b91f5;
+  --sl-accent-hover: #9aabf8;
+  --sl-accent-soft: #1d2442;
+  --sl-accent-text: #a9b7fa;
+  --sl-focus: #8ea1f7;
+  --sl-success: #4cc285;
+  --sl-success-soft: #13291e;
+  --sl-warning: #e6a744;
+  --sl-warning-soft: #2e2312;
+  --sl-danger: #f2766b;
+  --sl-danger-soft: #331a18;
+  --sl-info: #6aa8ee;
+  --sl-info-soft: #14243a;
+  --sl-violet: #b496ec;
+  --sl-violet-soft: #251c38;
+  --sl-highlight: #5c4a0f;
+  --sl-shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+}
+
+@theme inline {
+  --color-canvas: var(--sl-canvas);
+  --color-surface: var(--sl-surface);
+  --color-surface-muted: var(--sl-surface-muted);
+  --color-surface-sunken: var(--sl-surface-sunken);
+  --color-line: var(--sl-border);
+  --color-line-strong: var(--sl-border-strong);
+  --color-fg: var(--sl-text);
+  --color-fg-muted: var(--sl-text-muted);
+  --color-fg-subtle: var(--sl-text-subtle);
+  --color-fg-inverse: var(--sl-text-inverse);
+  --color-accent: var(--sl-accent);
+  --color-accent-hover: var(--sl-accent-hover);
+  --color-accent-soft: var(--sl-accent-soft);
+  --color-accent-fg: var(--sl-accent-text);
+  --color-focus: var(--sl-focus);
+  --color-success: var(--sl-success);
+  --color-success-soft: var(--sl-success-soft);
+  --color-warning: var(--sl-warning);
+  --color-warning-soft: var(--sl-warning-soft);
+  --color-danger: var(--sl-danger);
+  --color-danger-soft: var(--sl-danger-soft);
+  --color-info: var(--sl-info);
+  --color-info-soft: var(--sl-info-soft);
+  --color-violet: var(--sl-violet);
+  --color-violet-soft: var(--sl-violet-soft);
+  --color-highlight: var(--sl-highlight);
+  --shadow-overlay: var(--sl-shadow-overlay);
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  /* Restrained radii: controls 6px, panels 8px. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --breakpoint-xs: 30rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas text-fg font-sans antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  /* Inputs at 16px on touch devices so iOS Safari never zooms on focus. */
+  @media (pointer: coarse) {
+    input, textarea, select { font-size: 16px; }
+  }
+  :focus-visible {
+    outline: 2px solid var(--sl-focus);
+    outline-offset: 2px;
+  }
+  ::selection { background: var(--sl-accent-soft); }
+  [hidden] { display: none !important; }
+}
+
+@layer utilities {
+  .tabular { font-variant-numeric: tabular-nums; }
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
