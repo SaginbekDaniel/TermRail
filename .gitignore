@@ -1,0 +1,30 @@
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Runtime data (private documents, exports, logs)
+var/
+apps/api/var/
+
+# Node / web
+node_modules/
+apps/web/dist/
+apps/web/test-results/
+apps/web/playwright-report/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+*.tsbuildinfo
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
