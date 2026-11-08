@@ -2,7 +2,7 @@
 // with the server's stable error `code` (localized by the UI, see i18n `errors.*`).
 
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api/v1'
-const TOKEN_KEY = 'scopelock.token'
+const TOKEN_KEY = 'termrail.token'
 
 let token: string | null = readToken()
 let onUnauthorized: (() => void) | null = null

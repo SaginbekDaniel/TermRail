@@ -344,7 +344,7 @@ async def change_order_out(session: AsyncSession, co: ChangeOrder) -> S.ChangeOr
             )
         ).all()
     )
-    names = await user_names(session, {r.created_by for r in revisions} | {a.actor_id for a in approvals})
+    names = await user_names(session, {*(r.created_by for r in revisions), *(a.actor_id for a in approvals)})
 
     def rev_out(r: ChangeOrderRevision) -> S.RevisionOut:
         return S.RevisionOut(

@@ -63,10 +63,16 @@ async def upload_document(
     session.add(stored)
     await session.flush()
     next_version = (
-        await session.scalar(
-            select(func.coalesce(func.max(DocumentVersion.version), 0)).where(DocumentVersion.project_id == project.id)
+        int(
+            await session.scalar(
+                select(func.coalesce(func.max(DocumentVersion.version), 0)).where(
+                    DocumentVersion.project_id == project.id
+                )
+            )
+            or 0
         )
-    ) + 1
+        + 1
+    )
     version = DocumentVersion(
         workspace_id=project.workspace_id,
         project_id=project.id,

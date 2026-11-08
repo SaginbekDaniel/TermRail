@@ -1,4 +1,4 @@
-"""Test harness: real PostgreSQL (scopelock_test), real migrations, real storage on a temp dir.
+"""Test harness: real PostgreSQL (termrail_test), real migrations, real storage on a temp dir.
 
 The only substitute is the AI provider: APP_ENV=test enables the deterministic FakeLLMProvider.
 """
@@ -15,23 +15,23 @@ os.environ["APP_ENV"] = "test"
 os.environ["AI_PROVIDER"] = "fake"
 os.environ["JWT_SECRET"] = "test-secret-" + "x" * 32
 os.environ["DATABASE_URL"] = os.environ.get(
-    "TEST_DATABASE_URL", "postgresql+asyncpg://scopelock:scopelock@localhost:5432/scopelock_test"
+    "TEST_DATABASE_URL", "postgresql+asyncpg://termrail:termrail@localhost:5432/termrail_test"
 )
-os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="scopelock-test-")
+os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="termrail-test-")
 os.environ["RUN_WORKER_IN_PROCESS"] = "false"
 
-import httpx  # noqa: E402
-import pytest  # noqa: E402
-from alembic import command  # noqa: E402
-from alembic.config import Config  # noqa: E402
-from sqlalchemy import text  # noqa: E402
-from sqlalchemy.ext.asyncio import create_async_engine  # noqa: E402
+import httpx
+import pytest
+from alembic.config import Config
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.core.config import get_settings  # noqa: E402
-from app.db.session import get_sessionmaker  # noqa: E402
-from app.jobs.runner import drain  # noqa: E402
-from app.llm.factory import set_provider_override  # noqa: E402
-from app.main import create_app  # noqa: E402
+from alembic import command
+from app.core.config import get_settings
+from app.db.session import get_sessionmaker
+from app.jobs.runner import drain
+from app.llm.factory import set_provider_override
+from app.main import create_app
 
 API_ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = API_ROOT.parents[1] / "fixtures"

@@ -15,7 +15,7 @@ import httpx
 
 from app.llm.base import LLMInvalidOutput, LLMNotConfigured, LLMResult, LLMUnavailable
 
-log = logging.getLogger("scopelock.llm")
+log = logging.getLogger("termrail.llm")
 
 RETRYABLE_STATUS = {408, 409, 429, 500, 502, 503, 504}
 

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     )
 
     app_env: Literal["development", "test", "staging", "production"] = "development"
-    database_url: str = "postgresql+asyncpg://scopelock:scopelock@localhost:5432/scopelock"
+    database_url: str = "postgresql+asyncpg://termrail:termrail@localhost:5432/termrail"
 
     # --- Auth -------------------------------------------------------------
     # "local": email/password accounts stored in PostgreSQL, HS256 JWTs issued by this API.

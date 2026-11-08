@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * ScopeLock design tokens. The theme (light/dark) is resolved before first paint by the boot
+ * TermRail design tokens. The theme (light/dark) is resolved before first paint by the boot
  * script in index.html, which always sets data-theme on <html>.
  * Components use ONLY these semantic tokens (via the Tailwind theme
  * below), never raw palette values, so light/dark and future re-theming stay a one-file change.

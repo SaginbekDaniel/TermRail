@@ -1,7 +1,7 @@
 [project]
-name = "scopelock-api"
+name = "termrail-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "TermRail API: contract-first commercial control for client projects"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.20.1",
@@ -26,6 +26,7 @@ dev = [
     "pytest>=9.2.0",
     "pytest-asyncio>=1.4.1.post1",
     "ruff>=0.17.4",
+    "types-reportlab>=5.1.0.20261104",
 ]
 
 [tool.ruff]

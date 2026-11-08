@@ -470,8 +470,9 @@ async def export_pdf(session: AsyncSession, *, co_id: uuid.UUID, user: User, dra
             raise Conflict("Only an approved revision can be exported", code="APPROVAL_REQUIRED")
         if co.approved_revision_id != co.current_revision_id:
             raise Conflict("The current revision is not the approved one", code="APPROVAL_REQUIRED")
-        rev = await session.get(ChangeOrderRevision, co.approved_revision_id)
-        assert rev is not None
+        approved_rev = await session.get(ChangeOrderRevision, co.approved_revision_id)
+        assert approved_rev is not None
+        rev = approved_rev
         approval = await session.scalar(
             select(Approval)
             .where(

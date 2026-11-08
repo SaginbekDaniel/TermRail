@@ -52,7 +52,7 @@ LABELS: dict[str, dict[str, str]] = {
         "revision": "Revision",
         "hash": "Content hash",
         "approved_by": "Approved by",
-        "disclaimer": "Prepared with ScopeLock. This proposal requires review by an authorised person and "
+        "disclaimer": "Prepared with TermRail. This proposal requires review by an authorised person and "
         "becomes binding only when accepted by both parties in accordance with the contract.",
         "version": "v",
         "page": "Page",
@@ -87,7 +87,7 @@ LABELS: dict[str, dict[str, str]] = {
         "revision": "Редакция",
         "hash": "Хеш содержимого",
         "approved_by": "Утвердил",
-        "disclaimer": "Подготовлено в ScopeLock. Предложение требует проверки уполномоченным лицом и становится "
+        "disclaimer": "Подготовлено в TermRail. Предложение требует проверки уполномоченным лицом и становится "
         "обязательным только после согласования обеими сторонами в порядке, предусмотренном договором.",
         "version": "в",
         "page": "Стр.",
@@ -108,7 +108,7 @@ def format_money(value: str | Decimal, currency: str) -> str:
     whole, _, frac = f"{d:.2f}".partition(".")
     sign = "-" if whole.startswith("-") else ""
     whole = whole.lstrip("-")
-    groups = []
+    groups: list[str] = []
     while whole:
         groups.insert(0, whole[-3:])
         whole = whole[:-3]
@@ -133,7 +133,7 @@ def render_change_order_pdf(content: dict[str, Any], meta: dict[str, Any]) -> by
         leading=11.5,
         leftIndent=8,
         textColor=colors.HexColor("#323f4b"),
-        borderPadding=(2, 4, 2, 4),
+        borderPadding=(2, 4, 2, 4),  # type: ignore[arg-type]  # reportlab accepts a 4-tuple; stub says float
     )
     right = ParagraphStyle("right", parent=base, alignment=TA_RIGHT)
     banner = ParagraphStyle("banner", parent=base, fontName="SL-Bold", textColor=colors.white, fontSize=10)
@@ -202,7 +202,7 @@ def render_change_order_pdf(content: dict[str, Any], meta: dict[str, Any]) -> by
                     )
                 )
         est = item["estimate"]
-        rows = [
+        rows: list[list[Paragraph | str]] = [
             [p(L["work"], small), p(L["role"], small), p(L["hours"], small), p(L["rate"], small), p(L["amount"], small)]
         ]
         for ln in est["lines"]:
@@ -302,7 +302,7 @@ def render_change_order_pdf(content: dict[str, Any], meta: dict[str, Any]) -> by
         topMargin=16 * mm,
         bottomMargin=18 * mm,
         title=f"{L['doc']} #{content['number']}",
-        author="ScopeLock",
+        author="TermRail",
         subject=meta["content_hash"],
     )
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)

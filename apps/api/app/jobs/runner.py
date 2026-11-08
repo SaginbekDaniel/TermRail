@@ -20,7 +20,7 @@ from app.domains import analysis, documents, scope
 from app.jobs import queue
 from app.llm.base import LLMError
 
-log = logging.getLogger("scopelock.worker")
+log = logging.getLogger("termrail.worker")
 
 Handler = Callable[[AsyncSession, dict[str, Any]], Awaitable[Any]]
 FailureHook = Callable[[AsyncSession, dict[str, Any], str, str, bool], Awaitable[None]]
