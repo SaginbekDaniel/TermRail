@@ -11,6 +11,7 @@ from app.api.serializers import audit_out
 from app.db.models import AnalysisRun, ClientRequest, DocumentVersion, Finding, Project, ScopeBaseline
 from app.domains import audit, projects
 from app.domains import estimates as est_domain
+from app.integrations.telegram import signals as tg_signals
 
 router = APIRouter()
 
@@ -34,6 +35,7 @@ async def _summary(db: DB, p: Project) -> S.ProjectSummaryOut:  # type: ignore[v
         .where(AnalysisRun.project_id == p.id, Finding.review_status == "PENDING")
     )
     reqs = await db.scalar(select(func.count()).select_from(ClientRequest).where(ClientRequest.project_id == p.id))
+    open_signals = (await tg_signals.open_counts(db, [p.id])).get(p.id, 0)
     return S.ProjectSummaryOut(
         **S.ProjectOut.model_validate(p).model_dump(),
         documents=int(docs or 0),
@@ -41,6 +43,7 @@ async def _summary(db: DB, p: Project) -> S.ProjectSummaryOut:  # type: ignore[v
         has_draft=bool(has_draft),
         open_reviews=int(open_reviews or 0),
         requests=int(reqs or 0),
+        open_signals=open_signals,
     )
 
 

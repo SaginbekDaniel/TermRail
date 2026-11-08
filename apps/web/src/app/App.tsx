@@ -19,6 +19,7 @@ import { RatesTab } from '../features/projects/RatesTab'
 import { RequestReviewPage } from '../features/requests/RequestReviewPage'
 import { RequestsTab } from '../features/requests/RequestsTab'
 import { ScopeTab } from '../features/scope/ScopeTab'
+import { TelegramTab } from '../features/telegram/TelegramTab'
 import { SettingsPage } from '../features/settings/SettingsPage'
 import { ApiError } from '../lib/api'
 import { I18nProvider, useI18n } from '../lib/i18n'
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
               { path: 'documents', element: <DocumentsTab /> },
               { path: 'documents/:docId', element: <DocumentViewer /> },
               { path: 'scope', element: <ScopeTab /> },
+              { path: 'telegram', element: <TelegramTab /> },
               { path: 'requests', element: <RequestsTab /> },
               { path: 'rates', element: <RatesTab /> },
               { path: 'change-orders', element: <ProjectChangeOrdersTab /> },

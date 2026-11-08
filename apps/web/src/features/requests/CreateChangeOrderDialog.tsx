@@ -72,7 +72,7 @@ export function CreateChangeOrderDialog({ open, onClose, request, estimates }: {
               <label key={e.id} className="flex cursor-pointer items-start gap-2.5 rounded-md border border-line px-3 py-2.5 hover:bg-surface-muted">
                 <input
                   type="checkbox"
-                  className="mt-0.5 size-4 accent-(--sl-accent)"
+                  className="mt-0.5 size-4 accent-(--tr-accent)"
                   checked={chosen.has(e.id)}
                   onChange={() => {
                     const next = new Set(chosen)

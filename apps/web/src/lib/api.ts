@@ -98,6 +98,7 @@ export const api = {
   post: <T>(path: string, body?: Body, idempotencyKey?: string) => request<T>('POST', path, { body: body ?? {}, idempotencyKey }),
   put: <T>(path: string, body: Body) => request<T>('PUT', path, { body }),
   patch: <T>(path: string, body: Body) => request<T>('PATCH', path, { body }),
+  delete: <T>(path: string) => request<T>('DELETE', path),
   upload: <T>(path: string, form: FormData) => request<T>('POST', path, { body: form }),
 }
 

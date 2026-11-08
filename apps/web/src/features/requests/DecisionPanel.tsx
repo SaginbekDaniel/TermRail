@@ -62,7 +62,7 @@ function ReviewControls({ request, finding }: { request: ClientRequest; finding:
             <legend className="mb-1 text-[13px] font-medium">{t('scope.form.type')}</legend>
             {CATEGORY_ORDER.map((c) => (
               <label key={c} className="flex cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 hover:bg-surface-muted">
-                <input type="radio" name="category" value={c} checked={category === c} onChange={() => setCategory(c)} className="mt-1 accent-(--sl-accent)" />
+                <input type="radio" name="category" value={c} checked={category === c} onChange={() => setCategory(c)} className="mt-1 accent-(--tr-accent)" />
                 <span><span className="block text-[13px] font-medium">{t(`categories.${c}`)}</span><span className="text-xs text-fg-muted">{t(`categoryHints.${c}`)}</span></span>
               </label>
             ))}

@@ -6,6 +6,9 @@ import type {
   AuditEvent,
   ChangeOrder,
   ChangeOrderListItem,
+  CommercialSignal,
+  CommercialSignalDetail,
+  EligibleChat,
   ClientRequest,
   DocumentVersion,
   Estimate,
@@ -18,6 +21,8 @@ import type {
   RequestListItem,
   ScopeState,
   SourceSpan,
+  TelegramBinding,
+  TelegramStatus,
 } from './types'
 
 const POLL_MS = 2000
@@ -40,6 +45,11 @@ export const qk = {
   projectAudit: (pid: string) => ['audit', 'project', pid] as const,
   members: (ws: string) => ['members', ws] as const,
   ai: ['ai'] as const,
+  telegramStatus: (ws: string) => ['telegram', 'status', ws] as const,
+  telegramChats: (ws: string) => ['telegram', 'chats', ws] as const,
+  telegramBinding: (pid: string) => ['telegram', 'binding', pid] as const,
+  signals: (pid: string, scope: 'active' | 'all') => ['signals', pid, scope] as const,
+  signal: (id: string) => ['signal', id] as const,
 }
 
 const jobActive = (j: Job | null | undefined) => j?.status === 'QUEUED' || j?.status === 'RUNNING'
@@ -123,3 +133,43 @@ export const useMembers = (ws: string) =>
 
 export const useAiStatus = () =>
   useQuery({ queryKey: qk.ai, queryFn: () => api.get<AIStatus>('/system/ai'), staleTime: 60_000 })
+
+// ---------------------------------------------------------------- Telegram
+const SLOW_POLL_MS = 5000
+
+export const useTelegramStatus = (ws: string) =>
+  useQuery({
+    queryKey: qk.telegramStatus(ws),
+    queryFn: () => api.get<TelegramStatus>(`/workspaces/${ws}/integrations/telegram/status`),
+    // While a link is in flight the user is in Telegram; reflect the handshake as soon as it lands.
+    refetchInterval: (q) => (q.state.data?.state === 'LINK_PENDING' ? POLL_MS : false),
+  })
+
+export const useEligibleChats = (ws: string, enabled: boolean) =>
+  useQuery({
+    queryKey: qk.telegramChats(ws),
+    queryFn: () => api.get<EligibleChat[]>(`/workspaces/${ws}/integrations/telegram/eligible-chats`),
+    enabled,
+    // Chats appear only after Telegram delivers a new message from them.
+    refetchInterval: (q) => (enabled && (q.state.data?.length ?? 0) === 0 ? SLOW_POLL_MS : false),
+  })
+
+export const useTelegramBinding = (pid: string) =>
+  useQuery({
+    queryKey: qk.telegramBinding(pid),
+    queryFn: () => api.get<TelegramBinding>(`/projects/${pid}/telegram/chat-binding`),
+    refetchInterval: (q) => (q.state.data?.last_batch?.state === 'OPEN' ? SLOW_POLL_MS : false),
+  })
+
+export const useSignals = (pid: string, scope: 'active' | 'all') =>
+  useQuery({
+    queryKey: qk.signals(pid, scope),
+    queryFn: () => api.get<CommercialSignal[]>(`/projects/${pid}/commercial-signals?status=${scope}`),
+  })
+
+export const useSignal = (id: string | null) =>
+  useQuery({
+    queryKey: qk.signal(id ?? 'none'),
+    queryFn: () => api.get<CommercialSignalDetail>(`/commercial-signals/${id}`),
+    enabled: Boolean(id),
+  })

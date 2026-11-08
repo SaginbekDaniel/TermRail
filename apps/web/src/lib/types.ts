@@ -41,6 +41,7 @@ export interface ProjectSummary extends Project {
   baseline_version: number | null
   has_draft: boolean
   open_reviews: number
+  open_signals: number
   requests: number
 }
 
@@ -408,3 +409,117 @@ export interface InboxItem {
   created_at: string
 }
 export interface AIStatus { provider: string; model: string | null; configured: boolean; error: string | null; data_notice: string }
+
+// ---------------------------------------------------------------- Telegram Business (read-only connector)
+export type TelegramState = 'UNLINKED' | 'LINK_PENDING' | 'CONNECTED' | 'ACCESS_REVOKED' | 'LINK_CONFLICT'
+export type BindingStatus = 'UNBOUND' | 'AWAITING_CHAT' | 'NEEDS_BASELINE' | 'READY' | 'MONITORING' | 'PAUSED'
+export type BatchState = 'OPEN' | 'PROCESSED' | 'NO_ACTION' | 'CANCELLED'
+
+export interface TelegramConnection {
+  id: UUID
+  status: 'CONNECTED' | 'ACCESS_REVOKED'
+  is_enabled: boolean
+  telegram_username: string | null
+  rights: string[]
+  linked_at: string | null
+  revoked_at: string | null
+  last_event_at: string | null
+}
+
+export interface TelegramStatus {
+  configured: boolean
+  bot_username: string | null
+  state: TelegramState
+  connection: TelegramConnection | null
+  pending_link: { id: UUID; status: string; expires_at: string; verified: boolean; telegram_username: string | null } | null
+}
+
+export interface LinkIntent {
+  intent_id: UUID
+  deep_link: string
+  expires_at: string
+}
+
+export interface EligibleChat {
+  chat_id: number
+  display_name: string
+  last_seen_at: string
+  bound_project_id: UUID | null
+}
+
+export interface MonitoringSettings {
+  message_debounce_seconds: number
+  max_batch_window_seconds: number
+  max_batch_messages: number
+  auto_send_messages: false
+  drafts_only: true
+  process_attachments: false
+  process_history_on_connect: false
+}
+
+export interface TelegramBinding {
+  status: BindingStatus
+  has_approved_baseline: boolean
+  binding_id: UUID | null
+  chat_id: number | null
+  display_name: string | null
+  monitoring_enabled: boolean
+  version: number | null
+  consent_at: string | null
+  settings: MonitoringSettings
+  last_batch: {
+    id: UUID
+    state: BatchState
+    outcome: string | null
+    message_count: number
+    last_message_at: string
+    quiet_until: string
+    processed_at: string | null
+  } | null
+}
+
+export type SignalCategory =
+  | Category
+  | 'TIMELINE_CHANGE_CANDIDATE'
+  | 'PAYMENT_COMMITMENT_MENTION'
+  | 'UNANALYZED'
+export type SignalStatus = 'OPEN' | 'CLARIFICATION_REQUESTED' | 'DISMISSED' | 'RESOLVED' | 'CONVERTED'
+export type EvidenceState = 'VALID' | 'CHANGED' | 'REVOKED'
+
+export interface CommercialSignal {
+  id: UUID
+  project_id: UUID
+  category: SignalCategory
+  summary: string
+  status: SignalStatus
+  evidence_state: EvidenceState
+  severity: 'HIGH' | 'MEDIUM' | 'LOW'
+  notify: boolean
+  occurrences: number
+  first_seen_at: string
+  last_seen_at: string
+  request_id: UUID | null
+  change_order_id: UUID | null
+  baseline_id: UUID | null
+  stale_baseline: boolean
+  resolution_reason: string | null
+  resolved_category: string | null
+  resolved_at: string | null
+  version: number
+}
+
+export interface SignalEvidence {
+  id: UUID
+  message_id: number
+  direction: 'INBOUND' | 'OUTBOUND'
+  sent_at: string
+  content_version: number
+  state: EvidenceState
+  quote: string | null
+}
+
+export interface CommercialSignalDetail extends CommercialSignal {
+  evidence: SignalEvidence[]
+  finding: Finding | null
+  baseline_version: number | null
+}

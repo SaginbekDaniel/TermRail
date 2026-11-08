@@ -140,7 +140,7 @@ export function ScopeItemDialog({ open, projectId, initial, onClose, onSave }: {
                   return (
                     <li key={s.id}>
                       <label className={cx('flex cursor-pointer gap-2.5 px-3 py-2 text-[13px]', on ? 'bg-accent-soft' : 'hover:bg-surface-muted')}>
-                        <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-(--sl-accent)" checked={on} onChange={() => toggle(s)} />
+                        <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-(--tr-accent)" checked={on} onChange={() => toggle(s)} />
                         <span className="min-w-0">
                           <span className="block leading-snug">{s.normalized_text}</span>
                           <span className="text-xs text-fg-subtle">{anchorLabel(s)}</span>

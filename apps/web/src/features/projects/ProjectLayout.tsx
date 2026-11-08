@@ -41,6 +41,7 @@ export function ProjectLayout() {
           { to: base, label: t('projects.tabs.overview'), end: true },
           { to: `${base}/documents`, label: t('projects.tabs.documents') },
           { to: `${base}/scope`, label: t('projects.tabs.scope') },
+          { to: `${base}/telegram`, label: t('projects.tabs.telegram'), count: p.open_signals },
           { to: `${base}/requests`, label: t('projects.tabs.requests'), count: p.open_reviews },
           { to: `${base}/rates`, label: t('projects.tabs.rates') },
           { to: `${base}/change-orders`, label: t('projects.tabs.changeOrders') },
