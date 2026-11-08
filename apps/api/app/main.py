@@ -7,7 +7,8 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import change_orders, documents, identity, projects, requests, scope, system
+from app.api import telegram_webhook
+from app.api.v1 import change_orders, documents, identity, projects, requests, scope, system, telegram
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
@@ -64,7 +65,7 @@ def create_app() -> FastAPI:
         return response
 
     install_error_handlers(app)
-    for module in (system, identity, projects, documents, scope, requests, change_orders):
+    for module in (system, identity, projects, documents, scope, requests, change_orders, telegram, telegram_webhook):
         app.include_router(module.router, prefix=API_PREFIX)
     return app
 

@@ -19,6 +19,12 @@ os.environ["DATABASE_URL"] = os.environ.get(
 )
 os.environ["STORAGE_DIR"] = tempfile.mkdtemp(prefix="termrail-test-")
 os.environ["RUN_WORKER_IN_PROCESS"] = "false"
+# Telegram connector in test mode: a fictional bot; nothing ever reaches api.telegram.org.
+os.environ["TELEGRAM_ENABLED"] = "true"
+os.environ["TELEGRAM_BOT_TOKEN"] = "7000000001:TEST-ONLY-NOT-A-REAL-TOKEN"
+os.environ["TELEGRAM_BOT_USERNAME"] = "termrail_test_bot"
+os.environ["TELEGRAM_WEBHOOK_SECRET"] = "test_webhook_secret_" + "s" * 24
+os.environ["TELEGRAM_DATA_KEY"] = "8l8zXxgCJ5I3o1Rk3hW8lD3cUeUqk1b8JZy0w7N7a0Y="
 
 import httpx
 import pytest
@@ -27,6 +33,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import command
+from app.core.clock import set_clock_override
 from app.core.config import get_settings
 from app.db.session import get_sessionmaker
 from app.jobs.runner import drain
@@ -37,6 +44,9 @@ API_ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = API_ROOT.parents[1] / "fixtures"
 
 TABLES = [
+    "signal_message_evidence", "commercial_signals", "telegram_batch_messages", "telegram_messages",
+    "telegram_batches", "telegram_chat_bindings", "telegram_chat_candidates", "telegram_update_receipts",
+    "telegram_link_intents", "telegram_business_connections",
     "change_order_exports", "approvals", "change_order_revisions", "change_orders", "estimate_lines", "estimates",
     "rate_cards", "finding_reviews", "finding_evidence", "findings", "analysis_runs", "request_items", "requests",
     "scope_evidence", "scope_items", "baseline_documents", "scope_baselines", "source_spans", "document_versions",
@@ -67,8 +77,10 @@ async def _clean() -> AsyncIterator[None]:
         await s.execute(text("TRUNCATE " + ", ".join(TABLES) + " RESTART IDENTITY CASCADE"))
         await s.commit()
     set_provider_override(None)
+    set_clock_override(None)
     yield
     set_provider_override(None)
+    set_clock_override(None)
 
 
 @pytest.fixture(scope="session")

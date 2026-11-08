@@ -17,7 +17,10 @@ class ClientRequest(Base):
 
     __tablename__ = "requests"
     __table_args__ = (
-        CheckConstraint("channel in ('MANUAL','EMAIL')", name="channel"),
+        CheckConstraint("channel in ('MANUAL','EMAIL','TELEGRAM')", name="channel"),
+        # USER: typed/pasted by a person. INTEGRATION: created by a connector on behalf of `created_by`
+        # (the verified connection owner) -- never presented as a manual submission.
+        CheckConstraint("origin in ('USER','INTEGRATION')", name="origin"),
         CheckConstraint("status in ('NEW','ANALYZING','NEEDS_REVIEW','REVIEWED','FAILED')", name="status"),
         CheckConstraint("length(btrim(message_text)) > 0", name="message_not_empty"),
         UniqueConstraint("project_id", "idempotency_key", name="uq_requests_project_idem"),
@@ -45,6 +48,10 @@ class ClientRequest(Base):
     received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="NEW")
     created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    origin: Mapped[str] = mapped_column(String(20), nullable=False, default="USER", server_default="USER")
+    source_batch_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("telegram_batches.id", use_alter=True), nullable=True, unique=True
+    )
     created_at: Mapped[datetime] = created_at_col()
 
 

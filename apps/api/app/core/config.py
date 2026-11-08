@@ -61,6 +61,23 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     allow_external_send: bool = False  # P0: there is no external send at all.
 
+    # --- Telegram Business (read-only connector) ----------------------------
+    # Official Bot API only. Use a separate bot, secret and data key per environment.
+    telegram_enabled: bool = False
+    telegram_bot_token: str = Field(default="", repr=False)
+    telegram_bot_username: str = ""
+    telegram_webhook_secret: str = Field(default="", repr=False)
+    # Fernet key(s), comma separated; the first encrypts, all decrypt (rotation). Generate with:
+    #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    telegram_data_key: str = Field(default="", repr=False)
+    telegram_link_ttl_seconds: int = 600
+    telegram_claim_window_hours: int = 24
+    telegram_message_debounce_seconds: int = 120
+    telegram_max_batch_window_seconds: int = 900
+    telegram_max_batch_messages: int = 100
+    telegram_max_webhook_bytes: int = 256 * 1024
+    telegram_message_retention_days: int = 90
+
     @model_validator(mode="after")
     def _validate(self) -> "Settings":
         if self.ai_provider == "fake" and self.app_env != "test":
@@ -70,6 +87,26 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET is required outside development/test")
         if self.auth_provider == "supabase" and not self.supabase_jwks_url:
             raise ValueError("SUPABASE_JWKS_URL is required when AUTH_PROVIDER=supabase")
+        if self.telegram_enabled:
+            missing = [
+                name
+                for name, value in (
+                    ("TELEGRAM_BOT_TOKEN", self.telegram_bot_token),
+                    ("TELEGRAM_BOT_USERNAME", self.telegram_bot_username),
+                    ("TELEGRAM_WEBHOOK_SECRET", self.telegram_webhook_secret),
+                    ("TELEGRAM_DATA_KEY", self.telegram_data_key),
+                )
+                if not value
+            ]
+            if missing:
+                raise ValueError(f"TELEGRAM_ENABLED=true requires {', '.join(missing)}")
+            if ":" not in self.telegram_bot_token or not self.telegram_bot_token.split(":", 1)[0].isdigit():
+                raise ValueError("TELEGRAM_BOT_TOKEN has an unexpected format")
+            if len(self.telegram_webhook_secret) < 32 or not all(
+                c.isalnum() or c in "_-" for c in self.telegram_webhook_secret
+            ):
+                # Telegram allows 1-256 chars of A-Z a-z 0-9 _ -; we require a strong value.
+                raise ValueError("TELEGRAM_WEBHOOK_SECRET must be >= 32 chars of A-Z, a-z, 0-9, _ or -")
         if self.allow_external_send:
             raise ValueError("ALLOW_EXTERNAL_SEND must stay false in P0 (no outbox implemented)")
         return self
@@ -78,6 +115,11 @@ class Settings(BaseSettings):
     def effective_jwt_secret(self) -> str:
         # Development convenience only; staging/production refuse to start without a secret.
         return self.jwt_secret or "dev-only-insecure-secret-change-me-0123456789"
+
+    @property
+    def telegram_bot_id(self) -> int | None:
+        head = self.telegram_bot_token.split(":", 1)[0]
+        return int(head) if head.isdigit() else None
 
     @property
     def cors_origin_list(self) -> list[str]:

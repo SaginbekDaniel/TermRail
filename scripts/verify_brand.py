@@ -25,6 +25,9 @@ ALLOWED: dict[str, str] = {
     "apps/api/alembic/versions/20261107_0002_immutability_triggers.py": (
         "historical migration already applied to existing databases; never edited"
     ),
+    "TERMRAIL_MASTER_SPEC.md": (
+        "internal engineering spec whose rebrand section must name what is being removed; not shipped to customers"
+    ),
     "apps/api/alembic/versions/20261108_0003_rebrand_db_functions.py": (
         "renames the legacy DB function names created by 0002; must name them to rename them"
     ),
@@ -61,7 +64,7 @@ def main() -> int:
         for p in problems:
             print("  " + p)
         return 1
-    print(f"Rebrand verification: 0 legacy public references ({len(ALLOWED)} documented migration exceptions)")
+    print(f"Rebrand verification: 0 legacy public references ({len(ALLOWED)} documented exceptions)")
     return 0
 
 
