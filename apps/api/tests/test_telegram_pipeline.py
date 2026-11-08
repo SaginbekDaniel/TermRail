@@ -436,3 +436,24 @@ async def test_new_baseline_marks_open_signals_stale(client, alice: Actor) -> No
     assert sig2["stale_baseline"]  # evaluated against v1; never silently re-applied to v2
     d = (await alice.get(f"/commercial-signals/{sig['id']}")).json()
     assert d["baseline_version"] == 1
+
+
+async def test_retention_erases_old_bodies_but_not_open_batches(client, alice: Actor) -> None:  # type: ignore[no-untyped-def]
+    from app.integrations.telegram.retention import purge_expired
+
+    tg = TG(client)
+    clock = Clock()
+    p = await monitored_project(alice, tg)
+    await tg.ok(TG.message("Please add card payments"))
+    await settle(clock)
+    clock.advance(91 * 24 * 3600)  # past the 90-day default
+    await tg.ok(TG.message("Please add a CRM integration"))  # fresh, still in an OPEN batch
+    async with get_sessionmaker()() as s:
+        assert await purge_expired(s) == 1
+    async with get_sessionmaker()() as s:
+        rows = (await s.scalars(select(TelegramMessage).order_by(TelegramMessage.received_at))).all()
+        assert rows[0].text_ciphertext is None and rows[0].purged_at is not None
+        assert rows[1].text_ciphertext is not None
+    sig = next(x for x in await _signals(alice, p["id"]) if x["category"] == "CHANGE_CANDIDATE")
+    d = (await alice.get(f"/commercial-signals/{sig['id']}")).json()
+    assert d["evidence_state"] == "REVOKED" and d["evidence"][0]["quote"] is None

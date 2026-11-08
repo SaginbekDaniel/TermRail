@@ -409,7 +409,9 @@ export function MonitoringPanel({ projectId, binding, manage }: { projectId: str
           <h3 className="text-[13px] font-medium">{t('telegram.monitoring.rulesTitle')}</h3>
           <ul className="mt-2 space-y-1.5 text-[13px] text-fg-muted">
             {[
-              t('telegram.monitoring.rules.debounce', { n: minutes(s.message_debounce_seconds) }),
+              s.message_debounce_seconds < 60
+                ? t('telegram.monitoring.rules.debounceSeconds', { n: s.message_debounce_seconds })
+                : t('telegram.monitoring.rules.debounce', { n: minutes(s.message_debounce_seconds) }),
               t('telegram.monitoring.rules.cap', { n: minutes(s.max_batch_window_seconds) }),
               t('telegram.monitoring.rules.dedupe'),
               t('telegram.monitoring.rules.drafts'),

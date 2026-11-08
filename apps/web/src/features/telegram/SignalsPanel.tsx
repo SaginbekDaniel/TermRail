@@ -124,7 +124,8 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-type Pending = { kind: 'dismiss' } | { kind: 'resolve'; category: 'IN_SCOPE' | 'BUG_FIX' } | null
+type Decision = 'DISMISS' | 'IN_SCOPE' | 'BUG_FIX'
+const DECISIONS: Decision[] = ['DISMISS', 'IN_SCOPE', 'BUG_FIX']
 
 function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; projectId: string; manage: boolean; onClose: () => void }) {
   const { t, formatDate } = useI18n()
@@ -133,12 +134,14 @@ function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; p
   const notify = useToast()
   const navigate = useNavigate()
   const errorMessage = useErrorMessage()
-  const [pending, setPending] = useState<Pending>(null)
+  const [closing, setClosing] = useState(false)
+  const [decision, setDecision] = useState<Decision>('DISMISS')
   const [reason, setReason] = useState('')
   const [questions, setQuestions] = useState<string[] | null>(null)
 
   const close = () => {
-    setPending(null)
+    setClosing(false)
+    setDecision('DISMISS')
     setReason('')
     setQuestions(null)
     onClose()
@@ -150,11 +153,11 @@ function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; p
   }
 
   const decide = useMutation({
-    mutationFn: (p: NonNullable<Pending>) => {
+    mutationFn: (d: Decision) => {
       const s = q.data!
-      return p.kind === 'dismiss'
+      return d === 'DISMISS'
         ? api.post<CommercialSignalDetail>(`/commercial-signals/${s.id}/dismiss`, { expected_version: s.version, reason })
-        : api.post<CommercialSignalDetail>(`/commercial-signals/${s.id}/resolve`, { expected_version: s.version, reason, category: p.category })
+        : api.post<CommercialSignalDetail>(`/commercial-signals/${s.id}/resolve`, { expected_version: s.version, reason, category: d })
     },
     onSuccess: (data) => {
       refresh(data)
@@ -192,23 +195,24 @@ function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; p
     ? t(`telegram.signals.hints.${s.category}`) : null
   const actionError = decide.error ?? clarify.error ?? review.error
 
+  // Mobile: secondary actions share one row, the primary action gets its own full-width row.
+  const secondary = 'flex-1 sm:flex-none'
   const footer = s && manage ? (
-    pending ? (
+    closing ? (
       <>
-        <Button onClick={() => setPending(null)}>{t('common.cancel')}</Button>
-        <Button variant="primary" disabled={reason.trim().length < 3} loading={decide.isPending} onClick={() => decide.mutate(pending)}>
+        <Button className={secondary} onClick={() => setClosing(false)}>{t('common.cancel')}</Button>
+        <Button className={secondary} variant="primary" disabled={reason.trim().length < 3} loading={decide.isPending}
+          onClick={() => decide.mutate(decision)}>
           {t('common.confirm')}
         </Button>
       </>
     ) : active ? (
       <>
-        <Button variant="ghost" onClick={() => setPending({ kind: 'dismiss' })}>{t('telegram.signals.actions.dismiss')}</Button>
-        <Button onClick={() => setPending({ kind: 'resolve', category: 'IN_SCOPE' })}>{t('telegram.signals.actions.inScope')}</Button>
-        <Button onClick={() => setPending({ kind: 'resolve', category: 'BUG_FIX' })}>{t('telegram.signals.actions.bugFix')}</Button>
+        <Button className={secondary} onClick={() => setClosing(true)}>{t('telegram.signals.actions.close')}</Button>
         {s.status === 'OPEN' && (
-          <Button loading={clarify.isPending} onClick={() => clarify.mutate()}>{t('telegram.signals.actions.clarify')}</Button>
+          <Button className={secondary} loading={clarify.isPending} onClick={() => clarify.mutate()}>{t('telegram.signals.actions.clarify')}</Button>
         )}
-        <Button variant="primary" loading={review.isPending} disabled={s.evidence_state === 'REVOKED' && !s.request_id}
+        <Button className="w-full sm:w-auto" variant="primary" loading={review.isPending} disabled={s.evidence_state === 'REVOKED' && !s.request_id}
           onClick={() => review.mutate()}>
           {s.request_id ? t('telegram.signals.actions.review') : t('telegram.signals.actions.convert')}
         </Button>
@@ -241,15 +245,27 @@ function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; p
           {hint && <Alert tone="info" title={hint} />}
           {s!.resolution_reason && !active && <p className="text-[13px] text-fg-muted">{t('telegram.signals.resolution', { reason: s!.resolution_reason })}</p>}
 
-          {pending && (
-            <Field label={t('telegram.signals.reason')}
-              hint={pending.kind === 'dismiss' ? t('telegram.signals.dismissTitle')
-                : t('telegram.signals.resolveTitle', { category: t(`telegram.signals.category.${pending.category}`) })}>
-              {(p) => (
-                <Textarea {...p} rows={3} maxLength={2000} autoFocus placeholder={t('telegram.signals.reasonPlaceholder')}
-                  value={reason} onChange={(e) => setReason(e.target.value)} />
-              )}
-            </Field>
+          {closing && (
+            <div className="space-y-3 rounded-md border border-line p-3">
+              <fieldset>
+                <legend className="text-[13px] font-medium">{t('telegram.signals.decision')}</legend>
+                <div className="mt-2 space-y-1.5">
+                  {DECISIONS.map((d) => (
+                    <label key={d} className="flex items-center gap-2 text-[13px]">
+                      <input type="radio" name="signal-decision" className="size-4 accent-(--tr-accent)" checked={decision === d}
+                        onChange={() => setDecision(d)} />
+                      {t(`telegram.signals.decisions.${d}`)}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <Field label={t('telegram.signals.reason')}>
+                {(p) => (
+                  <Textarea {...p} rows={3} maxLength={2000} placeholder={t('telegram.signals.reasonPlaceholder')}
+                    value={reason} onChange={(e) => setReason(e.target.value)} />
+                )}
+              </Field>
+            </div>
           )}
 
           {questions !== null && (
@@ -312,7 +328,7 @@ function SignalDialog({ id, projectId, manage, onClose }: { id: string | null; p
             </>
           )}
 
-          {active && manage && !pending && (
+          {active && manage && !closing && (
             <Section title={t('telegram.signals.nextStep')}>
               <p className="text-[13px] text-fg-muted">{t('telegram.signals.nextStepBody')}</p>
             </Section>

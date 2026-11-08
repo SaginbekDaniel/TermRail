@@ -158,12 +158,30 @@ describe('SignalsPanel', () => {
     wrap(<SignalsPanel projectId="p1" manage />)
     await userEvent.click(await screen.findByText('Card payments on checkout'))
     const dialog = await screen.findByRole('dialog')
-    await userEvent.click(await within(dialog).findByRole('button', { name: 'Dismiss' }))
+    await userEvent.click(await within(dialog).findByRole('button', { name: 'Close case…' }))
+    expect(within(dialog).getByRole('radio', { name: 'Not a commercial change' })).toBeChecked()
     const confirm = within(dialog).getByRole('button', { name: 'Confirm' })
     expect(confirm).toBeDisabled()
     await userEvent.type(within(dialog).getByRole('textbox'), 'agreed in kickoff')
     await userEvent.click(confirm)
     await waitFor(() => expect(calls.find((c) => c.url.endsWith('/dismiss'))?.body).toEqual({ expected_version: 4, reason: 'agreed in kickoff' }))
+  })
+
+  it('closes a case as in scope through the resolve endpoint', async () => {
+    const calls = mockApi({
+      'GET /projects/p1/commercial-signals?status=active': [signal],
+      'GET /commercial-signals/s1': detail,
+      'POST /commercial-signals/s1/resolve': { ...detail, status: 'RESOLVED', version: 5 },
+    })
+    wrap(<SignalsPanel projectId="p1" manage />)
+    await userEvent.click(await screen.findByText('Card payments on checkout'))
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.click(await within(dialog).findByRole('button', { name: 'Close case…' }))
+    await userEvent.click(within(dialog).getByRole('radio', { name: 'Covered by the approved scope' }))
+    await userEvent.type(within(dialog).getByRole('textbox'), 'in SOW 2.1')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Confirm' }))
+    await waitFor(() => expect(calls.find((c) => c.url.endsWith('/resolve'))?.body)
+      .toEqual({ expected_version: 4, reason: 'in SOW 2.1', category: 'IN_SCOPE' }))
   })
 
   it('shows no actions to viewers', async () => {
@@ -172,7 +190,7 @@ describe('SignalsPanel', () => {
     await userEvent.click(await screen.findByText('Card payments on checkout'))
     const dialog = await screen.findByRole('dialog')
     await within(dialog).findByText('Please add card payments')
-    expect(within(dialog).queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Close case…' })).not.toBeInTheDocument()
   })
 
   it('shows the empty state', async () => {
