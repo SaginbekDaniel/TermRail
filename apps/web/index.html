@@ -1,19 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)" />
-    <title>ScopeLock AI</title>
+    <meta name="theme-color" content="#f6f6f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <title>TermRail</title>
+    <meta name="description" content="TermRail — контроль изменений объёма работ по клиентским проектам." />
     <script>
-      // Resolve theme before first paint (no flash). Preference: stored choice, else system.
+      // Resolve theme and language before first paint (no flash). Keep in sync with src/lib/storage.ts,
+      // src/lib/theme.tsx and src/lib/i18n. The legacy "scopelock.*" keys are read for users upgraded from the old name.
       (function () {
-        var pref = 'system';
-        try { pref = localStorage.getItem('scopelock.theme') || 'system'; } catch (e) {}
-        var dark = pref === 'dark' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        function read(name) {
+          try { return localStorage.getItem('termrail.' + name) || localStorage.getItem('scopelock.' + name); } catch (e) { return null; }
+        }
+        var pref = read('theme');
+        var dark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        var lang = read('locale');
+        if (lang === 'ru' || lang === 'kk' || lang === 'en') document.documentElement.lang = lang;
       })();
     </script>
   </head>

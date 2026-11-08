@@ -1,74 +1,91 @@
 @import "tailwindcss";
 
 /*
- * ScopeLock design tokens. The theme (light/dark) is resolved before first paint by the boot
- * script in index.html, which always sets data-theme on <html>.
- * Components use ONLY these semantic tokens (via the Tailwind theme
- * below), never raw palette values, so light/dark and future re-theming stay a one-file change.
+ * TermRail design tokens.
+ *
+ * The theme is resolved before first paint by the boot script in index.html (it always sets data-theme on
+ * <html>) and afterwards owned by ThemeProvider (src/lib/theme.tsx). Components use ONLY the semantic
+ * tokens exposed through the @theme block below, never raw palette values, so both themes and any future
+ * re-theming stay a one-file change.
+ *
+ * Surfaces step up in lightness (dark) / stay white-on-soft-neutral (light); separation comes from one
+ * hairline border colour rather than shadows. Brand blue is #4C69F6 (supplied logo); text-sized uses of
+ * it use --sl-accent-text, which is tuned per theme to stay above 4.5:1.
  */
 :root {
   color-scheme: light;
-  --sl-canvas: #f6f7f9;
+
+  --sl-canvas: #f6f6f8;
   --sl-surface: #ffffff;
-  --sl-surface-muted: #f1f3f6;
-  --sl-surface-sunken: #eceff3;
-  --sl-border: #dfe3e9;
-  --sl-border-strong: #c5ccd6;
-  --sl-text: #161b22;
-  --sl-text-muted: #525c69;
-  --sl-text-subtle: #737d8a;
-  --sl-text-inverse: #ffffff;
+  --sl-surface-muted: #f1f1f4;
+  --sl-surface-sunken: #ebebef;
+  --sl-border: #e5e5ea;
+  --sl-border-strong: #cdcdd5;
+  --sl-text: #0f0f12;
+  --sl-text-muted: #52525b;
+  --sl-text-subtle: #666672;
 
-  --sl-accent: #2f4ad0;
-  --sl-accent-hover: #2639ab;
-  --sl-accent-soft: #eaeefd;
-  --sl-accent-text: #2639ab;
-  --sl-focus: #2f4ad0;
+  /* Brand (identical in both themes, taken from the supplied logo files). */
+  --sl-brand: #4c69f6;
+  --sl-logo-ink: #111111;
 
-  --sl-success: #1a7f4b;
-  --sl-success-soft: #e6f4ec;
-  --sl-warning: #9a5b00;
-  --sl-warning-soft: #fdf1dc;
-  --sl-danger: #b42318;
-  --sl-danger-soft: #fdecea;
-  --sl-info: #1f63b5;
-  --sl-info-soft: #e7f0fb;
-  --sl-violet: #6b3fb8;
-  --sl-violet-soft: #f1ebfb;
+  --sl-accent: #4c69f6;
+  --sl-accent-hover: #3d58e0;
+  --sl-accent-soft: #eef1fe;
+  --sl-accent-text: #3552d6;
+  --sl-on-accent: #ffffff;
+  --sl-focus: #4c69f6;
+
+  --sl-success: #12763a;
+  --sl-success-soft: #e8f5ec;
+  --sl-warning: #9a5a06;
+  --sl-warning-soft: #fdf3df;
+  --sl-danger: #c0261b;
+  --sl-danger-soft: #fdeceb;
+  --sl-info: #1d5fbd;
+  --sl-info-soft: #e8f0fb;
+  --sl-violet: #6d3fc0;
+  --sl-violet-soft: #f2ecfb;
 
   --sl-highlight: #fff1b8;
-  --sl-shadow-overlay: 0 12px 32px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
+  --sl-scrim: rgb(15 15 18 / 0.4);
+  --sl-shadow-overlay: 0 12px 32px rgb(15 15 18 / 0.14), 0 2px 6px rgb(15 15 18 / 0.06);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --sl-canvas: #0f1216;
-  --sl-surface: #161a20;
-  --sl-surface-muted: #1c2128;
-  --sl-surface-sunken: #12161b;
-  --sl-border: #2a313b;
-  --sl-border-strong: #3a434f;
-  --sl-text: #e7eaee;
-  --sl-text-muted: #a3acb8;
-  --sl-text-subtle: #828c99;
-  --sl-text-inverse: #0f1216;
-  --sl-accent: #7b91f5;
-  --sl-accent-hover: #9aabf8;
-  --sl-accent-soft: #1d2442;
-  --sl-accent-text: #a9b7fa;
-  --sl-focus: #8ea1f7;
-  --sl-success: #4cc285;
-  --sl-success-soft: #13291e;
-  --sl-warning: #e6a744;
-  --sl-warning-soft: #2e2312;
-  --sl-danger: #f2766b;
-  --sl-danger-soft: #331a18;
-  --sl-info: #6aa8ee;
-  --sl-info-soft: #14243a;
-  --sl-violet: #b496ec;
-  --sl-violet-soft: #251c38;
-  --sl-highlight: #5c4a0f;
-  --sl-shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+
+  --sl-canvas: #09090b;
+  --sl-surface: #111113;
+  --sl-surface-muted: #18181b;
+  --sl-surface-sunken: #0c0c0e;
+  --sl-border: #222226;
+  --sl-border-strong: #35353c;
+  --sl-text: #ececf0;
+  --sl-text-muted: #a0a0ab;
+  --sl-text-subtle: #8a8a96;
+
+  --sl-logo-ink: #ffffff;
+
+  --sl-accent-hover: #6179f8;
+  --sl-accent-soft: #171c3a;
+  --sl-accent-text: #8ea2ff;
+  --sl-focus: #8ea2ff;
+
+  --sl-success: #44c47e;
+  --sl-success-soft: #0f2117;
+  --sl-warning: #e5a63f;
+  --sl-warning-soft: #261c0b;
+  --sl-danger: #f27468;
+  --sl-danger-soft: #2a1412;
+  --sl-info: #6aa8f0;
+  --sl-info-soft: #101e33;
+  --sl-violet: #b79cf0;
+  --sl-violet-soft: #1f1833;
+
+  --sl-highlight: #574610;
+  --sl-scrim: rgb(0 0 0 / 0.62);
+  --sl-shadow-overlay: 0 16px 40px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.04);
 }
 
 @theme inline {
@@ -81,11 +98,12 @@
   --color-fg: var(--sl-text);
   --color-fg-muted: var(--sl-text-muted);
   --color-fg-subtle: var(--sl-text-subtle);
-  --color-fg-inverse: var(--sl-text-inverse);
+  --color-brand: var(--sl-brand);
   --color-accent: var(--sl-accent);
   --color-accent-hover: var(--sl-accent-hover);
   --color-accent-soft: var(--sl-accent-soft);
   --color-accent-fg: var(--sl-accent-text);
+  --color-on-accent: var(--sl-on-accent);
   --color-focus: var(--sl-focus);
   --color-success: var(--sl-success);
   --color-success-soft: var(--sl-success-soft);
@@ -98,13 +116,16 @@
   --color-violet: var(--sl-violet);
   --color-violet-soft: var(--sl-violet-soft);
   --color-highlight: var(--sl-highlight);
+  --color-scrim: var(--sl-scrim);
   --shadow-overlay: var(--sl-shadow-overlay);
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Inter Variable is self-hosted (@fontsource-variable/inter) and covers Latin, Cyrillic and the
+     Kazakh-specific letters (ә ғ қ ң ө ұ ү һ і) with identical metrics on every platform. */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  /* Restrained radii: controls 6px, panels 8px. */
+  /* Restrained radii: small chips 4px, controls 6px, panels 8px. */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -131,6 +152,7 @@
   }
   ::selection { background: var(--sl-accent-soft); }
   [hidden] { display: none !important; }
+  dialog::backdrop { background: var(--sl-scrim); }
 }
 
 @layer utilities {

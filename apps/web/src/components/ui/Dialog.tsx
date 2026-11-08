@@ -41,7 +41,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
       }}
       className={cx(
         'm-0 mt-auto max-h-[92dvh] w-full max-w-none rounded-t-lg border border-line bg-surface p-0 text-fg shadow-overlay',
-        'backdrop:bg-black/40 sm:m-auto sm:rounded-lg',
+        'sm:m-auto sm:rounded-lg',
         size === 'lg' ? 'sm:max-w-3xl' : 'sm:max-w-lg',
       )}
     >

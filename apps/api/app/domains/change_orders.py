@@ -35,6 +35,7 @@ from app.domains import audit
 from app.domains.estimates import estimate_lines
 from app.domains.money import total
 from app.parsing.parser import anchor_label
+from app.pdf.change_order import DEFAULT_TITLES, SUPPORTED_LANGUAGES
 from app.storage import export_key, get_storage
 
 # state -> allowed transitions
@@ -202,9 +203,9 @@ async def create_change_order(
     items.sort(key=lambda i: ordinals.get(i["request_item_id"], 0))
     content: dict[str, Any] = {
         "schema": "change-order-v1",
-        "language": language if language in ("en", "ru") else "en",
+        "language": language if language in SUPPORTED_LANGUAGES else "en",
         "number": number,
-        "title": title.strip() or f"Change order #{number}",
+        "title": title.strip() or DEFAULT_TITLES.get(language, DEFAULT_TITLES["en"]).format(n=number),
         "summary": "",
         "project": {"id": str(project.id), "title": project.title, "client_name": project.client_name},
         "currency": project.currency,

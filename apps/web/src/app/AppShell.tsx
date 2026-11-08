@@ -1,23 +1,12 @@
 import { FileSignature, FolderKanban, Inbox, LayoutDashboard, LogOut, Menu, Settings, X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
+import { BrandLink } from '../components/brand/BrandLink'
+import { LanguageSwitcher, ThemeToggle } from '../components/ui/Preferences'
 import { cx } from '../components/ui/cx'
 import { useI18n, type MessageKey } from '../lib/i18n'
 import { useInbox } from '../lib/queries'
 import { useSession, useWorkspace } from '../lib/session'
-
-export function Logo() {
-  return (
-    <span className="flex items-center gap-2 font-semibold tracking-tight">
-      <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden>
-        <rect width="32" height="32" rx="7" className="fill-accent" />
-        <path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" />
-        <rect x="8.5" y="14" width="15" height="11" rx="2.5" fill="white" />
-      </svg>
-      ScopeLock
-    </span>
-  )
-}
 
 const NAV: { to: string; key: MessageKey; icon: ReactNode; end?: boolean }[] = [
   { to: '/', key: 'nav.overview', icon: <LayoutDashboard size={17} aria-hidden />, end: true },
@@ -43,14 +32,18 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
             className={({ isActive }) =>
               cx(
                 'flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors',
-                isActive ? 'bg-accent-soft font-medium text-accent-fg' : 'text-fg-muted hover:bg-surface-muted hover:text-fg',
+                isActive ? 'bg-surface-muted font-medium text-fg' : 'text-fg-muted hover:bg-surface-muted hover:text-fg',
               )
             }
           >
-            {item.icon}
-            <span className="flex-1">{t(item.key)}</span>
-            {item.to === '/inbox' && pending > 0 && (
-              <span className="rounded-sm bg-warning-soft px-1.5 text-xs font-medium text-warning tabular">{pending}</span>
+            {({ isActive }) => (
+              <>
+                <span className={isActive ? 'text-accent-fg' : undefined}>{item.icon}</span>
+                <span className="flex-1">{t(item.key)}</span>
+                {item.to === '/inbox' && pending > 0 && (
+                  <span className="rounded-sm bg-warning-soft px-1.5 text-xs font-medium text-warning tabular">{pending}</span>
+                )}
+              </>
             )}
           </NavLink>
         </li>
@@ -87,6 +80,10 @@ function SidebarFooter() {
     <div className="border-t border-line pt-3">
       <p className="truncate px-2.5 text-[13px] font-medium" title={me?.user.email}>{me?.user.display_name || me?.user.email}</p>
       <p className="truncate px-2.5 text-xs text-fg-subtle">{me?.user.email}</p>
+      <div className="mt-3 flex items-center justify-between gap-2 px-1">
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
       <button
         type="button"
         onClick={logout}
@@ -120,7 +117,7 @@ export function AppShell() {
 
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-dvh flex-col gap-4 border-r border-line bg-surface px-3 py-4 lg:flex">
-        <div className="px-2.5"><Logo /></div>
+        <div className="px-2.5 pt-0.5"><BrandLink /></div>
         <WorkspaceSwitcher />
         <nav aria-label={t('nav.primary')} className="flex-1 overflow-y-auto"><NavItems /></nav>
         <SidebarFooter />
@@ -129,24 +126,27 @@ export function AppShell() {
       {/* Mobile top bar */}
       <header className="pt-safe sticky top-0 z-30 border-b border-line bg-surface lg:hidden">
         <div className="flex h-13 items-center justify-between px-4">
-          <Logo />
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="-mr-2 rounded-md p-2 text-fg-muted hover:bg-surface-muted"
-            aria-label={t('nav.openMenu')}
-            aria-expanded={open}
-            aria-controls="mobile-nav"
-          >
-            <Menu size={20} aria-hidden />
-          </button>
+          <BrandLink className="h-4" />
+          <div className="-mr-2 flex items-center gap-0.5">
+            <ThemeToggle className="size-10" />
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="inline-flex size-10 items-center justify-center rounded-md text-fg-muted hover:bg-surface-muted hover:text-fg"
+              aria-label={t('nav.openMenu')}
+              aria-expanded={open}
+              aria-controls="mobile-nav"
+            >
+              <Menu size={20} aria-hidden />
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Mobile drawer */}
       <div className={cx('fixed inset-0 z-40 lg:hidden', !open && 'pointer-events-none')} aria-hidden={!open}>
         <div
-          className={cx('absolute inset-0 bg-black/40 transition-opacity', open ? 'opacity-100' : 'opacity-0')}
+          className={cx('absolute inset-0 bg-scrim transition-opacity', open ? 'opacity-100' : 'opacity-0')}
           onClick={() => setOpen(false)}
         />
         <div
@@ -161,7 +161,7 @@ export function AppShell() {
           )}
         >
           <div className="flex items-center justify-between px-2.5">
-            <Logo />
+            <BrandLink className="h-4" />
             <button type="button" onClick={() => setOpen(false)} className="rounded-md p-1.5 text-fg-muted hover:bg-surface-muted" aria-label={t('nav.closeMenu')}>
               <X size={18} aria-hidden />
             </button>

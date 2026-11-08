@@ -1,19 +1,12 @@
 // Typed API client. All requests carry the bearer token; errors are normalized into ApiError
 // with the server's stable error `code` (localized by the UI, see i18n `errors.*`).
 
+import { readStored, STORAGE, writeStored } from './storage'
+
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api/v1'
-const TOKEN_KEY = 'scopelock.token'
 
-let token: string | null = readToken()
+let token: string | null = readStored(STORAGE.token)
 let onUnauthorized: (() => void) | null = null
-
-function readToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY)
-  } catch {
-    return null
-  }
-}
 
 export function getToken(): string | null {
   return token
@@ -21,12 +14,7 @@ export function getToken(): string | null {
 
 export function setToken(value: string | null): void {
   token = value
-  try {
-    if (value) localStorage.setItem(TOKEN_KEY, value)
-    else localStorage.removeItem(TOKEN_KEY)
-  } catch {
-    // Private mode / blocked storage: the session simply lasts for this tab.
-  }
+  writeStored(STORAGE.token, value) // blocked storage: the session simply lasts for this tab
 }
 
 export function setUnauthorizedHandler(handler: (() => void) | null): void {

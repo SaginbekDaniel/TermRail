@@ -38,7 +38,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging()
     app = FastAPI(
-        title="ScopeLock AI API",
+        title="TermRail API",
         version="0.1.0",
         openapi_url=f"{API_PREFIX}/openapi.json",
         docs_url=f"{API_PREFIX}/docs",

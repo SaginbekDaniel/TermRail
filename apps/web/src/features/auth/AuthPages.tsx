@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { Link, Navigate, useLocation } from 'react-router'
-import { Logo } from '../../app/AppShell'
+import { StandalonePage } from '../../components/layout/StandalonePage'
 import { Button } from '../../components/ui/Button'
 import { Alert, useErrorMessage } from '../../components/ui/Feedback'
 import { Field, Input } from '../../components/ui/Field'
@@ -9,15 +9,14 @@ import { useSession } from '../../lib/session'
 
 function AuthLayout({ title, subtitle, children, footer }: { title: string; subtitle: string; children: ReactNode; footer: ReactNode }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
-        <div className="mb-6"><Logo /></div>
+    <StandalonePage>
+      <div className="rounded-lg border border-line bg-surface p-6 sm:p-7">
         <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-        <p className="mt-1 text-fg-muted">{subtitle}</p>
+        <p className="mt-1.5 text-fg-muted">{subtitle}</p>
         <div className="mt-6">{children}</div>
-        <p className="mt-6 text-fg-muted">{footer}</p>
       </div>
-    </main>
+      <p className="mt-5 text-center text-fg-muted">{footer}</p>
+    </StandalonePage>
   )
 }
 

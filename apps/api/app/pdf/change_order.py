@@ -52,7 +52,7 @@ LABELS: dict[str, dict[str, str]] = {
         "revision": "Revision",
         "hash": "Content hash",
         "approved_by": "Approved by",
-        "disclaimer": "Prepared with ScopeLock. This proposal requires review by an authorised person and "
+        "disclaimer": "Prepared with TermRail. This proposal requires review by an authorised person and "
         "becomes binding only when accepted by both parties in accordance with the contract.",
         "version": "v",
         "page": "Page",
@@ -87,12 +87,54 @@ LABELS: dict[str, dict[str, str]] = {
         "revision": "Редакция",
         "hash": "Хеш содержимого",
         "approved_by": "Утвердил",
-        "disclaimer": "Подготовлено в ScopeLock. Предложение требует проверки уполномоченным лицом и становится "
+        "disclaimer": "Подготовлено в TermRail. Предложение требует проверки уполномоченным лицом и становится "
         "обязательным только после согласования обеими сторонами в порядке, предусмотренном договором.",
         "version": "в",
         "page": "Стр.",
     },
+    "kk": {
+        "doc": "Қосымша келісім (жоба)",
+        "draft": "ҚАРАЛАМА — БЕКІТІЛМЕГЕН. Жіберуге болмайды.",
+        "approved": "Ішкі бекітілген редакция",
+        "project": "Жоба",
+        "client": "Тапсырыс беруші",
+        "baseline": "Бекітілген жұмыс көлемі",
+        "request": "Тапсырыс берушінің сұрауы алынды",
+        "summary": "Сипаттама",
+        "items": "Сұралған өзгерістер",
+        "requirement": "Талап",
+        "why": "Бұл не себепті өзгеріс",
+        "evidence": "Шарттағы негіз",
+        "work": "Жұмыстар",
+        "role": "Рөл",
+        "hours": "Сағат",
+        "rate": "Мөлшерлеме",
+        "amount": "Сома",
+        "fixed": "Тіркелген баға",
+        "subtotal": "Тармақ бойынша жиыны",
+        "total": "Қосымша құнның жиыны",
+        "timeline": "Мерзімге әсері",
+        "days": "күн",
+        "terms": "Шарттар",
+        "acceptance": "Қабылдау өлшемшарттары",
+        "exclusions": "Кірмейтін жұмыстар",
+        "valid_until": "Жарамдылық мерзімі",
+        "revision": "Редакция",
+        "hash": "Мазмұн хэші",
+        "approved_by": "Бекіткен",
+        "disclaimer": "TermRail жүйесінде дайындалды. Ұсыныс уәкілетті тұлғаның тексеруін қажет етеді және "
+        "шартта көзделген тәртіппен екі тарап келіскеннен кейін ғана міндетті күшке енеді.",
+        "version": "v",
+        "page": "Бет",
+    },
 }
+
+
+DRAFT_WATERMARK = {"en": "DRAFT", "ru": "ЧЕРНОВИК", "kk": "ҚАРАЛАМА"}
+
+#: Default document titles, used when the author does not type one. Keep in step with LABELS languages.
+DEFAULT_TITLES = {"en": "Change order #{n}", "ru": "Дополнительное соглашение №{n}", "kk": "Қосымша келісім №{n}"}
+SUPPORTED_LANGUAGES = tuple(LABELS)
 
 
 def _register_fonts() -> None:
@@ -290,7 +332,7 @@ def render_change_order_pdf(content: dict[str, Any], meta: dict[str, Any]) -> by
             canvas.setFillColor(colors.Color(0.8, 0.1, 0.1, alpha=0.08))
             canvas.translate(105 * mm, 150 * mm)
             canvas.rotate(35)
-            canvas.drawCentredString(0, 0, "DRAFT" if lang == "en" else "ЧЕРНОВИК")
+            canvas.drawCentredString(0, 0, DRAFT_WATERMARK.get(lang, "DRAFT"))
         canvas.restoreState()
 
     buf = io.BytesIO()
@@ -302,7 +344,7 @@ def render_change_order_pdf(content: dict[str, Any], meta: dict[str, Any]) -> by
         topMargin=16 * mm,
         bottomMargin=18 * mm,
         title=f"{L['doc']} #{content['number']}",
-        author="ScopeLock",
+        author="TermRail",
         subject=meta["content_hash"],
     )
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
