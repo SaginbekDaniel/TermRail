@@ -33,7 +33,7 @@ describe('dictionaries', () => {
 
   // Guards against copy-pasting Russian into the Kazakh file (the two share one alphabet, so compare whole strings).
   it('kk does not reuse Russian strings, except language-neutral ones', () => {
-    const neutral = new Set(['TermRail', '—', 'SHA-256', '¶ {n}', 'v{n}', '{decision}: {name}'])
+    const neutral = new Set(['TermRail', 'Telegram', 'Telegram Business', '—', 'SHA-256', '¶ {n}', 'v{n}', '{decision}: {name}'])
     // Loanwords that are standard Kazakh as well (клиент, валюта, менеджер, провайдер, модель, промпт).
     const loanwords = new Set(['Клиент', 'Валюта', 'Менеджер', 'Провайдер', 'Модель', 'Промпт {v}'])
     const shared = Object.keys(flat.kk).filter(
