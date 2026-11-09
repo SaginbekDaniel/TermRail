@@ -18,6 +18,8 @@ class Project(Base):
         CheckConstraint("budget is null or budget >= 0", name="budget_nonnegative"),
         CheckConstraint("status in ('ACTIVE','ARCHIVED')", name="status"),
         UniqueConstraint("workspace_id", "idempotency_key", name="uq_projects_workspace_idem"),
+        # Target of composite (project_id, workspace_id) foreign keys that enforce tenant integrity.
+        UniqueConstraint("id", "workspace_id", name="uq_projects_id_workspace"),
         Index("ix_projects_ws_status_created", "workspace_id", "status", "created_at"),
     )
 

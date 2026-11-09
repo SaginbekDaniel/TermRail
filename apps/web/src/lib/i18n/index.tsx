@@ -7,7 +7,7 @@ export type { Locale, MessageKey } from './types'
 export { LANGUAGE_NAMES, LOCALES } from './types'
 
 const DICTS: Record<Locale, Messages> = { en, ru }
-const STORAGE_KEY = 'scopelock.locale'
+const STORAGE_KEY = 'termrail.locale'
 
 export type Vars = Record<string, string | number>
 

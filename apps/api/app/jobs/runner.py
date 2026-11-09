@@ -17,10 +17,11 @@ from app.core.errors import AppError
 from app.db.models import Job
 from app.db.session import get_sessionmaker
 from app.domains import analysis, documents, scope
+from app.integrations.telegram import batching, signals
 from app.jobs import queue
 from app.llm.base import LLMError
 
-log = logging.getLogger("scopelock.worker")
+log = logging.getLogger("termrail.worker")
 
 Handler = Callable[[AsyncSession, dict[str, Any]], Awaitable[Any]]
 FailureHook = Callable[[AsyncSession, dict[str, Any], str, str, bool], Awaitable[None]]
@@ -29,6 +30,8 @@ HANDLERS: dict[str, Handler] = {
     "parse_document": documents.handle_parse_document,
     "extract_scope": scope.handle_extract_scope,
     "analyze_request": analysis.handle_analyze_request,
+    batching.FINALIZE_JOB: batching.handle_finalize_batch,
+    signals.BUILD_JOB: signals.handle_build_signals,
 }
 FAILURE_HOOKS: dict[str, FailureHook] = {
     "analyze_request": analysis.on_analysis_failed,
@@ -63,6 +66,14 @@ async def run_job(job: Job) -> None:
     try:
         async with maker() as session:
             await handler(session, dict(job.payload))
+    except queue.JobDeferred as deferred:
+        async with maker() as session:
+            j = await session.get(Job, job.id)
+            assert j is not None
+            queue.mark_deferred(j, deferred.run_at)
+            await session.commit()
+        log.info("job_deferred", extra={"job_id": str(job.id), "kind": job.kind})
+        return
     except Exception as exc:  # noqa: BLE001
         code, message, retryable = _classify_error(exc)
         log.warning(

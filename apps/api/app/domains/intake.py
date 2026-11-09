@@ -92,6 +92,61 @@ async def create_request(
     return request, True, dup
 
 
+async def create_integration_request(
+    session: AsyncSession,
+    *,
+    project: Project,
+    on_behalf_of: uuid.UUID,
+    channel: str,
+    external_id: str,
+    sender: str,
+    message_text: str,
+    source_batch_id: uuid.UUID | None,
+) -> ClientRequest:
+    """Create a request on behalf of a connector (no commit). `on_behalf_of` is the verified connection
+    owner; origin=INTEGRATION records that no person typed or submitted it. Idempotent on external_id."""
+    if not message_text.strip():
+        raise Unprocessable("The message is empty", code="EMPTY_MESSAGE")
+    if len(message_text) > MAX_MESSAGE_CHARS:
+        raise Unprocessable(f"Messages are limited to {MAX_MESSAGE_CHARS} characters", code="MESSAGE_TOO_LONG")
+    existing = await session.scalar(
+        select(ClientRequest).where(
+            ClientRequest.workspace_id == project.workspace_id,
+            ClientRequest.channel == channel,
+            ClientRequest.external_id == external_id,
+        )
+    )
+    if existing is not None:
+        return existing
+    request = ClientRequest(
+        workspace_id=project.workspace_id,
+        project_id=project.id,
+        channel=channel,
+        external_id=external_id,
+        content_hash=content_hash(message_text),
+        sender=sender.strip()[:300],
+        subject="",
+        message_text=message_text,
+        status="NEW",
+        created_by=on_behalf_of,
+        origin="INTEGRATION",
+        source_batch_id=source_batch_id,
+    )
+    session.add(request)
+    await session.flush()
+    audit.record(
+        session,
+        workspace_id=project.workspace_id,
+        project_id=project.id,
+        actor_type="WORKER",
+        event_type="request.received",
+        object_type="request",
+        object_id=request.id,
+        metadata={"chars": len(message_text), "channel": channel, "on_behalf_of": str(on_behalf_of)},
+    )
+    return request
+
+
 async def request_items(session: AsyncSession, request_id: uuid.UUID) -> list[RequestItem]:
     return list(
         (

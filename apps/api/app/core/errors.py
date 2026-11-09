@@ -12,7 +12,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.request_context import get_request_id
 
-log = logging.getLogger("scopelock.errors")
+log = logging.getLogger("termrail.errors")
 
 
 class AppError(Exception):

@@ -14,7 +14,7 @@ export function Logo() {
         <path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" />
         <rect x="8.5" y="14" width="15" height="11" rx="2.5" fill="white" />
       </svg>
-      ScopeLock
+      TermRail
     </span>
   )
 }

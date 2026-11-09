@@ -2,7 +2,7 @@
 // with the server's stable error `code` (localized by the UI, see i18n `errors.*`).
 
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api/v1'
-const TOKEN_KEY = 'scopelock.token'
+const TOKEN_KEY = 'termrail.token'
 
 let token: string | null = readToken()
 let onUnauthorized: (() => void) | null = null
@@ -98,6 +98,7 @@ export const api = {
   post: <T>(path: string, body?: Body, idempotencyKey?: string) => request<T>('POST', path, { body: body ?? {}, idempotencyKey }),
   put: <T>(path: string, body: Body) => request<T>('PUT', path, { body }),
   patch: <T>(path: string, body: Body) => request<T>('PATCH', path, { body }),
+  delete: <T>(path: string) => request<T>('DELETE', path),
   upload: <T>(path: string, form: FormData) => request<T>('POST', path, { body: form }),
 }
 

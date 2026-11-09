@@ -62,8 +62,11 @@ async def start_analysis(
     user: User,
     baseline_id: uuid.UUID | None,
     idempotency_key: str | None,
+    on_behalf: bool = False,
 ) -> tuple[AnalysisRun, bool]:
-    """Create (or return) an analysis run bound to the CURRENT approved baseline and queue it."""
+    """Create (or return) an analysis run bound to the CURRENT approved baseline and queue it.
+
+    on_behalf=True: started by a connector for `user` (audit records the worker, not the person)."""
     if idempotency_key:
         existing = await session.scalar(
             select(AnalysisRun).where(
@@ -118,11 +121,17 @@ async def start_analysis(
         session,
         workspace_id=project.workspace_id,
         project_id=project.id,
-        actor_id=user.id,
+        actor_id=None if on_behalf else user.id,
+        actor_type="WORKER" if on_behalf else "USER",
         event_type="analysis.started",
         object_type="analysis_run",
         object_id=run.id,
-        metadata={"request_id": str(request.id), "baseline_id": str(baseline.id), "baseline_version": baseline.version},
+        metadata={
+            "request_id": str(request.id),
+            "baseline_id": str(baseline.id),
+            "baseline_version": baseline.version,
+            **({"on_behalf_of": str(user.id)} if on_behalf else {}),
+        },
     )
     await session.commit()
     return run, True
@@ -314,6 +323,7 @@ async def handle_analyze_request(session: AsyncSession, payload: dict[str, Any])
         any_review = any_review or bool(prior_review)
 
     run.status = "NEEDS_REVIEW" if any_review else "SUCCEEDED"
+    await _queue_integration_followup(session, run, request)
     run.token_usage = dict(usage)
     run.finished_at = datetime.now(UTC)
     request.status = "NEEDS_REVIEW" if any_review else "REVIEWED"
@@ -352,6 +362,7 @@ async def on_analysis_failed(
         request = await session.get(ClientRequest, run.request_id)
         if request is not None:
             request.status = "FAILED"
+            await _queue_integration_followup(session, run, request)
         audit.record(
             session,
             workspace_id=run.workspace_id,
@@ -365,6 +376,21 @@ async def on_analysis_failed(
     else:
         run.status = "QUEUED"
     await session.commit()
+
+
+async def _queue_integration_followup(session: AsyncSession, run: AnalysisRun, request: ClientRequest) -> None:
+    """Connector-originated requests turn their findings (or a failure) into reviewable signals."""
+    if request.source_batch_id is None:
+        return
+    await queue.enqueue(
+        session,
+        kind="telegram_build_signals",
+        workspace_id=run.workspace_id,
+        project_id=run.project_id,
+        payload={"analysis_run_id": str(run.id)},
+        idempotency_key=f"tgsignals:{run.id}:{run.status}",
+        max_attempts=5,
+    )
 
 
 async def retry_analysis(session: AsyncSession, *, run: AnalysisRun, user: User) -> AnalysisRun:

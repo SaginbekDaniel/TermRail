@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 export type ThemePref = 'system' | 'light' | 'dark'
-const KEY = 'scopelock.theme'
+const KEY = 'termrail.theme'
 
 function read(): ThemePref {
   try {

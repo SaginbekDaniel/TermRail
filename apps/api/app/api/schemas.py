@@ -116,6 +116,7 @@ class ProjectSummaryOut(ProjectOut):
     baseline_version: int | None = None
     has_draft: bool = False
     open_reviews: int = 0
+    open_signals: int = 0  # notify-worthy Telegram cases awaiting a human decision
     requests: int = 0
 
 

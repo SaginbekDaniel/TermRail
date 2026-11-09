@@ -23,7 +23,7 @@ EN_CONTRACT: list[tuple[str, str]] = [
     ("title", "SYNTHETIC DEMO CONTRACT — Website Development Agreement No. WD-2026-014"),
     (
         "p",
-        "This is a fictional contract created for ScopeLock demonstrations and tests. It does not describe a real "
+        "This is a fictional contract created for TermRail demonstrations and tests. It does not describe a real "
         "agreement between real parties.",
     ),
     ("p", "Parties: Northwind Studio LLP (the Contractor) and Aster Logistics LLP (the Client)."),
@@ -69,7 +69,7 @@ EN_CONTRACT: list[tuple[str, str]] = [
 
 RU_CONTRACT: list[tuple[str, str]] = [
     ("title", "СИНТЕТИЧЕСКИЙ ДЕМО-ДОГОВОР — Договор на разработку сайта № WD-2026-015"),
-    ("p", "Это вымышленный договор для демонстраций и тестов ScopeLock. Он не описывает реальное соглашение."),
+    ("p", "Это вымышленный договор для демонстраций и тестов TermRail. Он не описывает реальное соглашение."),
     ("h", "1. Предмет и стоимость"),
     ("p", "Исполнитель разрабатывает корпоративный сайт Заказчика по фиксированной цене 1 000 000 тенге."),
     ("h", "2. Объём работ (входит в стоимость)"),
@@ -116,7 +116,7 @@ def make_pdf(path: Path, content: list[tuple[str, str]]) -> None:
         leftMargin=20 * mm,
         rightMargin=20 * mm,
         title="Synthetic demo contract",
-        author="ScopeLock fixtures",
+        author="TermRail fixtures",
     )
     story = []
     for kind, text in content:

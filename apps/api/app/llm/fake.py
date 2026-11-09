@@ -153,7 +153,7 @@ class FakeLLMProvider:
         def cite(es: list[dict[str, Any]]) -> list[dict[str, str]]:
             return [{"ref": e["ref"], "quote": e["text"][:80]} for e in es[:2]]
 
-        base = {"uncertainties": [], "clarifying_questions": [], "counter_evidence": []}
+        base: dict[str, Any] = {"uncertainties": [], "clarifying_questions": [], "counter_evidence": []}
         if any(k in low for k in _VAGUE) and not excluded:
             return {
                 **base,

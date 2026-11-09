@@ -20,7 +20,7 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING)
     # Fetch server-generated values (created_at/updated_at, computed columns) with RETURNING so they
     # never need a lazy refresh, which is not possible with AsyncSession.
-    __mapper_args__ = {"eager_defaults": True}
+    __mapper_args__ = {"eager_defaults": True}  # noqa: RUF012 - SQLAlchemy reads this per class
 
 
 def uuid_pk() -> Mapped[uuid.UUID]:

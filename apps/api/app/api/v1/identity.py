@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
+from typing import cast
 
 from fastapi import APIRouter, Request
 from sqlalchemy import func, select
@@ -162,7 +163,7 @@ async def inbox(workspace_id: uuid.UUID, user: CurrentUser, db: DB) -> list[S.In
             project_id=p.id,
             project_title=p.title,
             requirement=i.exact_text,
-            category=f.category,
+            category=cast(S.Category, f.category),
             summary=f.summary,
             received_at=r.received_at,
             created_at=f.created_at,  # type: ignore[arg-type]

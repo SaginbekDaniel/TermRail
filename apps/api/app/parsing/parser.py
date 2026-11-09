@@ -175,7 +175,8 @@ def parse_pdf(data: bytes, max_pages: int) -> ParsedDocument:
         spans: list[ParsedSpan] = []
         page_chars: list[int] = []
         heading: str | None = None
-        for page_index, page in enumerate(doc):
+        for page_index in range(doc.page_count):
+            page = doc[page_index]
             blocks = [b for b in page.get_text("blocks", sort=True) if b[6] == 0]  # text blocks only
             block_texts = [b[4].rstrip("\n") for b in blocks]
             page_text = "\n".join(block_texts)

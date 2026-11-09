@@ -16,8 +16,8 @@ from app.core.errors import Unauthorized
 
 _hasher = PasswordHasher()
 
-LOCAL_ISSUER = "scopelock"
-LOCAL_AUDIENCE = "scopelock-api"
+LOCAL_ISSUER = "termrail"
+LOCAL_AUDIENCE = "termrail-api"
 
 
 def hash_password(password: str) -> str:

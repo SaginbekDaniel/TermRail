@@ -7,11 +7,11 @@ export default defineConfig({
   server: {
     port: 5173,
     // Dev: same-origin API calls, proxied to the FastAPI server.
-    proxy: { '/api': { target: process.env.SCOPELOCK_API_ORIGIN ?? 'http://127.0.0.1:8000', changeOrigin: false } },
+    proxy: { '/api': { target: process.env.TERMRAIL_API_ORIGIN ?? 'http://127.0.0.1:8000', changeOrigin: false } },
   },
   preview: {
     port: 4173,
-    proxy: { '/api': { target: process.env.SCOPELOCK_API_ORIGIN ?? 'http://127.0.0.1:8000', changeOrigin: false } },
+    proxy: { '/api': { target: process.env.TERMRAIL_API_ORIGIN ?? 'http://127.0.0.1:8000', changeOrigin: false } },
   },
   test: {
     environment: 'jsdom',

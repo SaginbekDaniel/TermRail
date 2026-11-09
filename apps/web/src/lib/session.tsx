@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { api, getToken, setToken, setUnauthorizedHandler } from './api'
 import type { Me, TokenOut, Workspace } from './types'
 
-const WS_KEY = 'scopelock.workspace'
+const WS_KEY = 'termrail.workspace'
 
 interface Session {
   status: 'anonymous' | 'loading' | 'ready'

@@ -167,10 +167,14 @@ async def create_estimate(
             raise Unprocessable("Unknown line kind", code="INVALID_LINE_KIND")
 
     version = (
-        await session.scalar(
-            select(func.coalesce(func.max(Estimate.version), 0)).where(Estimate.request_item_id == item.id)
+        int(
+            await session.scalar(
+                select(func.coalesce(func.max(Estimate.version), 0)).where(Estimate.request_item_id == item.id)
+            )
+            or 0
         )
-    ) + 1
+        + 1
+    )
     estimate = Estimate(
         workspace_id=project.workspace_id,
         project_id=project.id,
