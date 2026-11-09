@@ -1,9 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { api, getToken, setToken, setUnauthorizedHandler } from './api'
+import { readStored, STORAGE, writeStored } from './storage'
 import type { Me, TokenOut, Workspace } from './types'
-
-const WS_KEY = 'termrail.workspace'
 
 interface Session {
   status: 'anonymous' | 'loading' | 'ready'
@@ -19,19 +18,11 @@ interface Session {
 
 const Ctx = createContext<Session | null>(null)
 
-function storedWorkspace(): string | null {
-  try {
-    return localStorage.getItem(WS_KEY)
-  } catch {
-    return null
-  }
-}
-
 export function SessionProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient()
   const [hasToken, setHasToken] = useState(() => Boolean(getToken()))
   const [expired, setExpired] = useState(false)
-  const [workspaceId, setWorkspaceId] = useState<string | null>(storedWorkspace)
+  const [workspaceId, setWorkspaceId] = useState<string | null>(() => readStored(STORAGE.workspace))
 
   const meQuery = useQuery({
     queryKey: ['me'],
@@ -76,11 +67,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const selectWorkspace = useCallback((id: string) => {
     setWorkspaceId(id)
-    try {
-      localStorage.setItem(WS_KEY, id)
-    } catch {
-      // ignore
-    }
+    writeStored(STORAGE.workspace, id)
   }, [])
 
   const value = useMemo<Session>(() => {

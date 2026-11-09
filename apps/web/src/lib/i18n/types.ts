@@ -12,8 +12,19 @@ export type MessageKey<T = Messages> = {
   [K in keyof T & string]: T[K] extends string ? K : Join<K, MessageKey<T[K]>>
 }[keyof T & string]
 
-export type Locale = 'en' | 'ru'
-export const LOCALES: Locale[] = ['en', 'ru']
+export type Locale = 'ru' | 'kk' | 'en'
+/** Display order of the language switcher. */
+export const LOCALES: Locale[] = ['ru', 'kk', 'en']
 
 /** Language names are shown in their own language (endonyms), so they are not translated. */
-export const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', ru: 'Русский' }
+export const LANGUAGE_NAMES: Record<Locale, string> = { ru: 'Русский', kk: 'Қазақша', en: 'English' }
+
+/** Short labels for compact switchers (header, auth screens). */
+export const LANGUAGE_CODES: Record<Locale, string> = { ru: 'RU', kk: 'ҚАЗ', en: 'EN' }
+
+/** BCP 47 tags used for Intl formatting and the <html lang> attribute. */
+export const INTL_TAGS: Record<Locale, string> = { ru: 'ru-RU', kk: 'kk-KZ', en: 'en-US' }
+
+export function isLocale(value: unknown): value is Locale {
+  return value === 'ru' || value === 'kk' || value === 'en'
+}

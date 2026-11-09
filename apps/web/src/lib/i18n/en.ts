@@ -42,6 +42,14 @@ export const en = {
     workspace: 'Workspace',
     skipToContent: 'Skip to content',
   },
+  prefs: {
+    menu: 'Display preferences',
+    language: 'Language',
+    theme: 'Theme',
+    toLight: 'Switch to light theme',
+    toDark: 'Switch to dark theme',
+    brandHome: 'TermRail home',
+  },
   auth: {
     signInTitle: 'Sign in to TermRail',
     signInSubtitle: 'Contract-aware change control for client projects.',
@@ -550,6 +558,7 @@ export const en = {
     aiNotConfigured: 'Not configured',
     aiNotConfiguredHint: 'Scope extraction and request analysis are unavailable until an API key is configured on the server. TermRail never substitutes simulated answers.',
     dataNotice: 'What is sent to the AI provider',
+    dataNoticeBody: 'Contract fragments and client message text are sent to this AI provider only when you run scope extraction or request analysis. No other data is sent.',
     preferences: 'Preferences',
     language: 'Language',
     theme: 'Theme',

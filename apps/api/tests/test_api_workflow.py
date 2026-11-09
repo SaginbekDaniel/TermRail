@@ -4,6 +4,7 @@ findings -> review -> Decimal estimate -> change order -> approval -> PDF export
 from __future__ import annotations
 
 import asyncio
+import uuid
 from decimal import Decimal
 
 import pymupdf
@@ -540,3 +541,42 @@ async def test_audit_trail_is_append_only(alice: Actor) -> None:
             with pytest.raises(DBAPIError, match="IMMUTABLE_ROW"):
                 await s.execute(text(stmt))
             await s.rollback()
+
+
+@pytest.mark.parametrize(
+    ("language", "default_title", "label"),
+    [
+        ("kk", "Қосымша келісім №1", "Тапсырыс беруші"),
+        ("ru", "Дополнительное соглашение №1", "Заказчик"),
+        ("en", "Change order #1", "Client"),
+    ],
+)
+async def test_change_order_document_language(alice: Actor, language: str, default_title: str, label: str) -> None:
+    """The document language selects labels, default title and draft watermark; Kazakh letters must render."""
+    p = await create_project(alice)
+    await approved_baseline(alice, p["id"])
+    req = await analysed_request(alice, p["id"])
+    pay = by_text(req["latest_run"]["findings"], req["items"], "card payments")
+    await alice.post(f"/requests/{req['id']}/findings/{pay['id']}/review", json={"decision": "ACCEPT"})
+    await alice.put(f"/projects/{p['id']}/rates",
+                    json={"expected_revision": 0, "rates": [{"role": "Developer", "hourly_rate": "10000"}]})
+    est = (await alice.post(f"/requests/{req['id']}/estimates", json={
+        "request_item_id": pay["request_item_id"], "lines": [{"kind": "HOURLY", "role": "Developer", "hours": "10"}],
+    })).json()
+    await alice.post(f"/estimates/{est['id']}/approve")
+    r = await alice.post("/change-orders", json={"request_id": req["id"], "estimate_ids": [est["id"]], "language": language})
+    assert r.status_code in (200, 201), r.text
+    co = r.json()
+    assert co["current"]["content"]["language"] == language
+    assert co["current"]["content"]["title"] == default_title
+
+    prev = (await alice.post(f"/change-orders/{co['id']}/export", json={"draft": True})).json()
+    pdf = await alice.get(f"/change-orders/{co['id']}/exports/{prev['id']}/download")
+    text = "".join(pg.get_text() for pg in pymupdf.open(stream=pdf.content, filetype="pdf"))
+    assert default_title in text and label in text
+    assert "TermRail" in text and "ScopeLock" not in text
+
+
+async def test_change_order_rejects_unknown_language(alice: Actor) -> None:
+    r = await alice.post("/change-orders", json={"request_id": str(uuid.uuid4()), "estimate_ids": [str(uuid.uuid4())], "language": "de"})
+    assert r.status_code == 422

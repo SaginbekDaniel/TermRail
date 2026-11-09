@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router'
-import { Logo } from '../../app/AppShell'
+import { StandalonePage } from '../../components/layout/StandalonePage'
 import { Button } from '../../components/ui/Button'
 import { Alert, useErrorMessage } from '../../components/ui/Feedback'
 import { Field, Input } from '../../components/ui/Field'
@@ -43,10 +43,9 @@ export function CreateWorkspacePage() {
   }
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
-      <div className="grid w-full max-w-3xl gap-8 md:grid-cols-[1fr_1fr]">
+    <StandalonePage width="lg">
+      <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <div className="mb-6"><Logo /></div>
           <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.title')}</h1>
           <p className="mt-1 text-fg-muted">{t('onboarding.subtitle')}</p>
           <form onSubmit={submit} className="mt-6 space-y-4">
@@ -75,6 +74,6 @@ export function CreateWorkspacePage() {
           </ol>
         </section>
       </div>
-    </main>
+    </StandalonePage>
   )
 }

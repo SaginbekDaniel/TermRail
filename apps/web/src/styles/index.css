@@ -1,74 +1,91 @@
 @import "tailwindcss";
 
 /*
- * TermRail design tokens. The theme (light/dark) is resolved before first paint by the boot
- * script in index.html, which always sets data-theme on <html>.
- * Components use ONLY these semantic tokens (via the Tailwind theme
- * below), never raw palette values, so light/dark and future re-theming stay a one-file change.
+ * TermRail design tokens.
+ *
+ * The theme is resolved before first paint by the boot script in index.html (it always sets data-theme on
+ * <html>) and afterwards owned by ThemeProvider (src/lib/theme.tsx). Components use ONLY the semantic
+ * tokens exposed through the @theme block below, never raw palette values, so both themes and any future
+ * re-theming stay a one-file change.
+ *
+ * Surfaces step up in lightness (dark) / stay white-on-soft-neutral (light); separation comes from one
+ * hairline border colour rather than shadows. Brand blue is #4C69F6 (supplied logo); text-sized uses of
+ * it use --tr-accent-text, which is tuned per theme to stay above 4.5:1.
  */
 :root {
   color-scheme: light;
-  --tr-canvas: #f6f7f9;
+
+  --tr-canvas: #f6f6f8;
   --tr-surface: #ffffff;
-  --tr-surface-muted: #f1f3f6;
-  --tr-surface-sunken: #eceff3;
-  --tr-border: #dfe3e9;
-  --tr-border-strong: #c5ccd6;
-  --tr-text: #161b22;
-  --tr-text-muted: #525c69;
-  --tr-text-subtle: #737d8a;
-  --tr-text-inverse: #ffffff;
+  --tr-surface-muted: #f1f1f4;
+  --tr-surface-sunken: #ebebef;
+  --tr-border: #e5e5ea;
+  --tr-border-strong: #cdcdd5;
+  --tr-text: #0f0f12;
+  --tr-text-muted: #52525b;
+  --tr-text-subtle: #666672;
 
-  --tr-accent: #2f4ad0;
-  --tr-accent-hover: #2639ab;
-  --tr-accent-soft: #eaeefd;
-  --tr-accent-text: #2639ab;
-  --tr-focus: #2f4ad0;
+  /* Brand (identical in both themes, taken from the supplied logo files). */
+  --tr-brand: #4c69f6;
+  --tr-logo-ink: #111111;
 
-  --tr-success: #1a7f4b;
-  --tr-success-soft: #e6f4ec;
-  --tr-warning: #9a5b00;
-  --tr-warning-soft: #fdf1dc;
-  --tr-danger: #b42318;
-  --tr-danger-soft: #fdecea;
-  --tr-info: #1f63b5;
-  --tr-info-soft: #e7f0fb;
-  --tr-violet: #6b3fb8;
-  --tr-violet-soft: #f1ebfb;
+  --tr-accent: #4c69f6;
+  --tr-accent-hover: #3d58e0;
+  --tr-accent-soft: #eef1fe;
+  --tr-accent-text: #3552d6;
+  --tr-on-accent: #ffffff;
+  --tr-focus: #4c69f6;
+
+  --tr-success: #12763a;
+  --tr-success-soft: #e8f5ec;
+  --tr-warning: #9a5a06;
+  --tr-warning-soft: #fdf3df;
+  --tr-danger: #c0261b;
+  --tr-danger-soft: #fdeceb;
+  --tr-info: #1d5fbd;
+  --tr-info-soft: #e8f0fb;
+  --tr-violet: #6d3fc0;
+  --tr-violet-soft: #f2ecfb;
 
   --tr-highlight: #fff1b8;
-  --tr-shadow-overlay: 0 12px 32px rgb(16 24 40 / 0.16), 0 2px 6px rgb(16 24 40 / 0.08);
+  --tr-scrim: rgb(15 15 18 / 0.4);
+  --tr-shadow-overlay: 0 12px 32px rgb(15 15 18 / 0.14), 0 2px 6px rgb(15 15 18 / 0.06);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --tr-canvas: #0f1216;
-  --tr-surface: #161a20;
-  --tr-surface-muted: #1c2128;
-  --tr-surface-sunken: #12161b;
-  --tr-border: #2a313b;
-  --tr-border-strong: #3a434f;
-  --tr-text: #e7eaee;
-  --tr-text-muted: #a3acb8;
-  --tr-text-subtle: #828c99;
-  --tr-text-inverse: #0f1216;
-  --tr-accent: #7b91f5;
-  --tr-accent-hover: #9aabf8;
-  --tr-accent-soft: #1d2442;
-  --tr-accent-text: #a9b7fa;
-  --tr-focus: #8ea1f7;
-  --tr-success: #4cc285;
-  --tr-success-soft: #13291e;
-  --tr-warning: #e6a744;
-  --tr-warning-soft: #2e2312;
-  --tr-danger: #f2766b;
-  --tr-danger-soft: #331a18;
-  --tr-info: #6aa8ee;
-  --tr-info-soft: #14243a;
-  --tr-violet: #b496ec;
-  --tr-violet-soft: #251c38;
-  --tr-highlight: #5c4a0f;
-  --tr-shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.4);
+
+  --tr-canvas: #09090b;
+  --tr-surface: #111113;
+  --tr-surface-muted: #18181b;
+  --tr-surface-sunken: #0c0c0e;
+  --tr-border: #222226;
+  --tr-border-strong: #35353c;
+  --tr-text: #ececf0;
+  --tr-text-muted: #a0a0ab;
+  --tr-text-subtle: #8a8a96;
+
+  --tr-logo-ink: #ffffff;
+
+  --tr-accent-hover: #6179f8;
+  --tr-accent-soft: #171c3a;
+  --tr-accent-text: #8ea2ff;
+  --tr-focus: #8ea2ff;
+
+  --tr-success: #44c47e;
+  --tr-success-soft: #0f2117;
+  --tr-warning: #e5a63f;
+  --tr-warning-soft: #261c0b;
+  --tr-danger: #f27468;
+  --tr-danger-soft: #2a1412;
+  --tr-info: #6aa8f0;
+  --tr-info-soft: #101e33;
+  --tr-violet: #b79cf0;
+  --tr-violet-soft: #1f1833;
+
+  --tr-highlight: #574610;
+  --tr-scrim: rgb(0 0 0 / 0.62);
+  --tr-shadow-overlay: 0 16px 40px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.04);
 }
 
 @theme inline {
@@ -81,11 +98,12 @@
   --color-fg: var(--tr-text);
   --color-fg-muted: var(--tr-text-muted);
   --color-fg-subtle: var(--tr-text-subtle);
-  --color-fg-inverse: var(--tr-text-inverse);
+  --color-brand: var(--tr-brand);
   --color-accent: var(--tr-accent);
   --color-accent-hover: var(--tr-accent-hover);
   --color-accent-soft: var(--tr-accent-soft);
   --color-accent-fg: var(--tr-accent-text);
+  --color-on-accent: var(--tr-on-accent);
   --color-focus: var(--tr-focus);
   --color-success: var(--tr-success);
   --color-success-soft: var(--tr-success-soft);
@@ -98,13 +116,16 @@
   --color-violet: var(--tr-violet);
   --color-violet-soft: var(--tr-violet-soft);
   --color-highlight: var(--tr-highlight);
+  --color-scrim: var(--tr-scrim);
   --shadow-overlay: var(--tr-shadow-overlay);
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Inter Variable is self-hosted (@fontsource-variable/inter) and covers Latin, Cyrillic and the
+     Kazakh-specific letters (ә ғ қ ң ө ұ ү һ і) with identical metrics on every platform. */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  /* Restrained radii: controls 6px, panels 8px. */
+  /* Restrained radii: small chips 4px, controls 6px, panels 8px. */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -131,6 +152,7 @@
   }
   ::selection { background: var(--tr-accent-soft); }
   [hidden] { display: none !important; }
+  dialog::backdrop { background: var(--tr-scrim); }
 }
 
 @layer utilities {

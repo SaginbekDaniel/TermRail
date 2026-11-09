@@ -24,6 +24,7 @@ import { SettingsPage } from '../features/settings/SettingsPage'
 import { ApiError } from '../lib/api'
 import { I18nProvider, useI18n } from '../lib/i18n'
 import { SessionProvider, useSession } from '../lib/session'
+import { ThemeProvider } from '../lib/theme'
 import { AppShell } from './AppShell'
 
 const queryClient = new QueryClient({
@@ -107,14 +108,16 @@ const router = createBrowserRouter([
 
 export function App() {
   return (
-    <I18nProvider>
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <ToastProvider>
-            <RouterProvider router={router} />
-          </ToastProvider>
-        </SessionProvider>
-      </QueryClientProvider>
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+          </SessionProvider>
+        </QueryClientProvider>
+      </I18nProvider>
+    </ThemeProvider>
   )
 }

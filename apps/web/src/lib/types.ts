@@ -302,7 +302,7 @@ export interface ChangeOrderContentItem {
 }
 export interface ChangeOrderContent {
   schema: string
-  language: 'en' | 'ru'
+  language: 'en' | 'ru' | 'kk'
   number: number
   title: string
   summary: string

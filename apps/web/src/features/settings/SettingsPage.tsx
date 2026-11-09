@@ -11,7 +11,7 @@ import { api } from '../../lib/api'
 import { LANGUAGE_NAMES, LOCALES, useI18n, type Locale } from '../../lib/i18n'
 import { qk, useAiStatus, useMembers } from '../../lib/queries'
 import { useSession, useWorkspace } from '../../lib/session'
-import { useTheme, type ThemePref } from '../../lib/theme'
+import { THEME_PREFS, useTheme, type ThemePref } from '../../lib/theme'
 import type { Role } from '../../lib/types'
 
 const ASSIGNABLE: Exclude<Role, 'OWNER'>[] = ['MANAGER', 'MEMBER', 'VIEWER']
@@ -112,7 +112,7 @@ function AiConnection() {
             {!ai.data.configured && <Alert tone="warning">{t('settings.aiNotConfiguredHint')}</Alert>}
             <div>
               <h3 className="text-[13px] font-semibold">{t('settings.dataNotice')}</h3>
-              <p className="mt-1 text-[13px] text-fg-muted">{ai.data.data_notice}</p>
+              <p className="mt-1 text-[13px] text-fg-muted">{t('settings.dataNoticeBody')}</p>
             </div>
           </>
         )}
@@ -125,7 +125,7 @@ export function SettingsPage() {
   const { t, locale, setLocale } = useI18n()
   const { me } = useSession()
   const ws = useWorkspace()
-  const [theme, setTheme] = useTheme()
+  const { pref: theme, setPref: setTheme } = useTheme()
 
   return (
     <>
@@ -156,7 +156,7 @@ export function SettingsPage() {
                   label={t('settings.theme')}
                   value={theme}
                   onChange={setTheme}
-                  options={(['system', 'light', 'dark'] as const).map((v) => ({ value: v, label: t(`settings.themes.${v}`) }))}
+                  options={THEME_PREFS.map((v) => ({ value: v, label: t(`settings.themes.${v}`) }))}
                 />
               </div>
               <p className="border-t border-line pt-3 text-[13px] text-fg-muted">{t('settings.signedInAs', { email: me?.user.email ?? '' })}</p>

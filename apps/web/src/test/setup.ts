@@ -1,9 +1,27 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
-import { afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 
-// Vitest runs without globals, so Testing Library cannot register its automatic cleanup.
-afterEach(() => cleanup())
+// jsdom has no matchMedia; tests drive "prefers-color-scheme" through this stub.
+export const media = { dark: false }
+vi.stubGlobal('matchMedia', (query: string) => ({
+  matches: query.includes('dark') ? media.dark : false,
+  media: query,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
+  onchange: null,
+}))
+
+afterEach(() => {
+  cleanup()
+  localStorage.clear()
+  media.dark = false
+  delete document.documentElement.dataset.theme
+  document.documentElement.lang = 'en'
+})
 
 // jsdom lacks the modal <dialog> API; emulate the open/close state the Dialog component relies on.
 if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.showModal) {

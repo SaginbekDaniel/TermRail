@@ -11,7 +11,7 @@ const base =
   'transition-colors disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-fg-inverse hover:bg-accent-hover',
+  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
   secondary: 'border border-line-strong bg-surface text-fg hover:bg-surface-muted',
   ghost: 'text-fg-muted hover:bg-surface-muted hover:text-fg',
   danger: 'border border-line-strong bg-surface text-danger hover:bg-danger-soft',

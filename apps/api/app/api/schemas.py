@@ -452,7 +452,7 @@ class ChangeOrderIn(BaseModel):
     request_id: uuid.UUID
     estimate_ids: list[uuid.UUID] = Field(min_length=1, max_length=50)
     title: str = Field(default="", max_length=300)
-    language: Literal["en", "ru"] = "en"
+    language: Literal["en", "ru", "kk"] = "en"
 
 
 class ChangeOrderPatch(BaseModel):
