@@ -62,7 +62,8 @@ export const useProjects = (ws: string) =>
   useQuery({ queryKey: qk.projects(ws), queryFn: () => api.get<ProjectSummary[]>(`/projects?workspace_id=${ws}`) })
 
 export const useProject = (id: string) =>
-  useQuery({ queryKey: qk.project(id), queryFn: () => api.get<ProjectSummary>(`/projects/${id}`) })
+  // `id` is '' while the owning request is still loading; `/projects/` would redirect to the (workspace-scoped) list and 422.
+  useQuery({ queryKey: qk.project(id), queryFn: () => api.get<ProjectSummary>(`/projects/${id}`), enabled: Boolean(id) })
 
 export const useDocuments = (pid: string) =>
   useQuery({

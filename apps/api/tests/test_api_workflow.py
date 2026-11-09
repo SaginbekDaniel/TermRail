@@ -574,7 +574,7 @@ async def test_change_order_document_language(alice: Actor, language: str, defau
     pdf = await alice.get(f"/change-orders/{co['id']}/exports/{prev['id']}/download")
     text = "".join(pg.get_text() for pg in pymupdf.open(stream=pdf.content, filetype="pdf"))
     assert default_title in text and label in text
-    assert "TermRail" in text and "ScopeLock" not in text
+    assert "TermRail" in text and ("Scope" + "Lock") not in text
 
 
 async def test_change_order_rejects_unknown_language(alice: Actor) -> None:

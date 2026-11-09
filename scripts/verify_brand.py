@@ -31,6 +31,12 @@ ALLOWED: dict[str, str] = {
     "apps/api/alembic/versions/20261108_0003_rebrand_db_functions.py": (
         "renames the legacy DB function names created by 0002; must name them to rename them"
     ),
+    # Browser-storage migration: users upgraded from the old name keep their session, language, theme and
+    # workspace because the app still READS the pre-rebrand keys once (and rewrites them under termrail.*).
+    "apps/web/src/lib/storage.ts": "reads pre-rebrand localStorage keys so upgraded users keep their preferences",
+    "apps/web/index.html": "pre-paint boot script reads the pre-rebrand theme/locale keys to avoid a flash on upgrade",
+    "apps/web/src/lib/theme.test.tsx": "regression test for the legacy theme-key migration",
+    "apps/web/src/lib/i18n/i18n.test.ts": "regression tests for the legacy locale-key migration and brand-free dictionaries",
 }
 
 

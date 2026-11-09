@@ -111,6 +111,16 @@ describe('ConnectionPanel', () => {
     expect(screen.queryByRole('button', { name: 'Connect Telegram' })).not.toBeInTheDocument()
   })
 
+  it('shows bot permissions as readable labels, falling back to the raw key for unknown rights', () => {
+    const connected: TelegramStatus = {
+      ...unlinked, state: 'CONNECTED',
+      connection: { id: 'c1', status: 'CONNECTED', is_enabled: true, telegram_username: 'owner', rights: ['can_read_messages', 'can_reply', 'can_future_right'], linked_at: '2026-11-08T09:00:00Z', revoked_at: null, last_event_at: null },
+    }
+    wrap(<ConnectionPanel workspaceId="w1" status={connected} manage />)
+    expect(screen.getByText('Read messages, Reply to messages, can_future_right')).toBeInTheDocument()
+    expect(screen.queryByText(/can_read_messages/)).not.toBeInTheDocument()
+  })
+
   it('explains a revoked connection', () => {
     const revoked: TelegramStatus = {
       ...unlinked, state: 'ACCESS_REVOKED',

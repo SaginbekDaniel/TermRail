@@ -103,7 +103,7 @@ const stateTone: Record<TelegramState, BadgeTone> = {
 }
 
 export function ConnectionPanel({ workspaceId, status, manage }: { workspaceId: string; status: TelegramStatus; manage: boolean }) {
-  const { t, formatDate } = useI18n()
+  const { t, td, formatDate } = useI18n()
   const qc = useQueryClient()
   const notify = useToast()
   const [intent, setIntent] = useState<LinkIntent | null>(null)
@@ -204,7 +204,9 @@ export function ConnectionPanel({ workspaceId, status, manage }: { workspaceId: 
                 { label: t('telegram.connection.account'), value: connection.telegram_username ? `@${connection.telegram_username}` : t('common.none') },
                 {
                   label: t('telegram.connection.rights'),
-                  value: connection.rights.length ? connection.rights.join(', ') : t('telegram.connection.noRights'),
+                  value: connection.rights.length
+                    ? connection.rights.map((r) => td(`telegram.connection.rightNames.${r}`, r)).join(', ')
+                    : t('telegram.connection.noRights'),
                 },
                 { label: t('telegram.connection.linkedAt'), value: formatDate(connection.linked_at, true) },
                 {
